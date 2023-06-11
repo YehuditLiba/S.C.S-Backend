@@ -74,10 +74,10 @@ namespace Dal.Implemention
             }
         }
         #endregion
-        public async Task<List<Station>> GetByStreetId(int streetId)
-        {
-            return await general.Stations.Where(s => (s.StationToCars.Where(stc => stc.StationId == s.Id && stc.CarId != null) && s.StreetId == streetId)).ToListAsync();
-        }
+        //public async Task<List<Station>> GetByStreetId(int streetId)
+        //{
+        //    return await general.Stations.Where(s => (s.StationToCars.Where(stc => stc.StationId == s.Id && stc.CarId != null) && s.StreetId == streetId)).ToListAsync();
+        //}
         public async Task<List<Station>> GetByNeighborhoodId(int streetId)
         {
             return await general.Stations.Where(s => s.StreetId == streetId && s.IsCenteral.Value).ToListAsync();
