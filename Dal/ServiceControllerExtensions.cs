@@ -20,6 +20,7 @@ namespace Dal
         {
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IStationRepository, StationRepository>();
+            services.AddScoped<ICarRepository, CarRepository>();
             services.AddDbContext<General>(options => options.UseSqlServer(connString));
         }
         public static string GetConnectionString(string connStrNameInCnfig)

@@ -23,8 +23,8 @@ namespace MyService.Controllers
         [Route("{numOfRentalHours}")]
         public async Task<StationDTO> FindLucrativeStation(int numOfRentalHours, [FromBody] int num, string street, string neighborhood, string city)
         {
-            StationDTO stationDTO = new StationDTO(num, street, neighborhood, city);
-            return await stationService.GetLucrativeStation(numOfRentalHours, stationDTO);
+            StationDTO station = new StationDTO(num, street, neighborhood, city);
+            return await stationService.FindLucrativeStation(numOfRentalHours, station);
         }
     }
 }
