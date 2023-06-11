@@ -54,24 +54,24 @@ namespace BL.Implementation
         //this public function return the nearest stationDTO:
         public async Task<StationDTO> GetNearestStation(StationDTO stationDTO)
         {
-            Station station = await FindNearestStation(stationDTO);
+            Station station = await FindNearestStation(true,stationDTO);
             return mapper.Map<StationDTO>(station);
         }
 
         //this private function return the nearest station:
-        private async Task<Station> FindNearestStation(StationDTO stationDTO)
+        private async Task<Station> FindNearestStation(bool fullStation, StationDTO stationDTO)
         {
             Point point = convertStationDTOToPoint(stationDTO);
-            return await stationRepository.GetNearestStation(point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
+            return await stationRepository.GetNearestStation(fullStation, point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
         }
 
-        public async Task<StationDTO> FindLucrativeStation(int numberOfRentalHours, StationDTO stationDTO)
+        public async Task<StationDTO> GetLucrativeStation(int numberOfRentalHours, StationDTO stationDTO)
         {
             const double NORMAL_WALKINK_DISTANCE_IN_KM = 1.00;
             const double AVERAGE_PRICE_OF_TAXI_FARE_FOR_KM = 13.5;
             Station lucrativeStation = new Station();
             //if the nearest station is centeral - this is the lucrative Station, so return it:
-            Station nearestStation = await FindNearestStation(stationDTO);
+            Station nearestStation = await FindNearestStation(false,stationDTO);
             if (nearestStation.IsCenteral.Value == true)
             {
                 lucrativeStation = nearestStation;
@@ -146,12 +146,6 @@ namespace BL.Implementation
                 stationDTO.City = "Jerusalem";
             }
             return point;
-        }
-        private StationDTO convertPointToStationDTO(Point point)
-        {
-            Station station = new Station();
-            return null;
-
         }
     }
 }

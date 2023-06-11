@@ -24,7 +24,7 @@ namespace MyService.Controllers
         public async Task<StationDTO> FindLucrativeStation(int numOfRentalHours, [FromBody] int num, string street, string neighborhood, string city)
         {
             StationDTO stationDTO = new StationDTO(num, street, neighborhood, city);
-            return await stationService.FindLucrativeStation(numOfRentalHours, stationDTO);
+            return await stationService.GetLucrativeStation(numOfRentalHours, stationDTO);
         }
     }
 }
