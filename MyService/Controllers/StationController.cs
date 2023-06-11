@@ -21,7 +21,7 @@ namespace MyService.Controllers
         }
         [HttpGet]
         [Route("{numOfRentalHours}")]
-        public async Task<Station> FindLucrativeStation(int numOfRentalHours, [FromBody] int num, string street, string neighborhood, string city)
+        public async Task<StationDTO> FindLucrativeStation(int numOfRentalHours, [FromBody] int num, string street, string neighborhood, string city)
         {
             StationDTO station = new StationDTO(num, street, neighborhood, city);
             return await stationService.FindLucrativeStation(numOfRentalHours, station);

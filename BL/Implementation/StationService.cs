@@ -62,7 +62,7 @@ namespace BL.Implementation
             return mapper.Map<StationDTO>(station);
         }
 
-        public async Task<Station> FindLucrativeStation(int numberOfRentalHours, StationDTO stationDTO)
+        public async Task<StationDTO> FindLucrativeStation(int numberOfRentalHours, StationDTO stationDTO)
         {
             //get the nearest station and check: if it centeral-well, return it
             //if not find the lucrative station and return it 
