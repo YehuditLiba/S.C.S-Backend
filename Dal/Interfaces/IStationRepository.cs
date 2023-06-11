@@ -5,11 +5,13 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Point = Dal.DataObject.Point;
 
 namespace Dal.Interfaces
 {
     public interface IStationRepository : IRepository<Station>
     {
-        public Station GetNearestStation(Station station);
+        public Task<Station> GetNearestStation(Point point, string street, string neighorhood, string city);
+
     }
 }
