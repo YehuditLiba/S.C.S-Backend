@@ -9,15 +9,17 @@ using System.Threading.Tasks;
 using System.Configuration;
 using Dal.DataObject;
 using Microsoft.EntityFrameworkCore;
+using Dal.Implemention;
 
 namespace Dal
 {
     public static class ServiceControllerExtensions
     {
         static string connString;
-        public static void AddRepositories (this IServiceCollection services)
+        public static void AddRepositories(this IServiceCollection services)
         {
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IStationRepository, StationRepository>();
             services.AddDbContext<General>(options => options.UseSqlServer(connString));
         }
         public static string GetConnectionString(string connStrNameInCnfig)
