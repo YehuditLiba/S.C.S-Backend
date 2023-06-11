@@ -74,29 +74,68 @@ namespace Dal.Implemention
             }
         }
         #endregion
-        //public async Task<List<Station>> GetByStreetId(int streetId)
-        //{
-        //    return await general.Stations.Where(s => (s.StationToCars.Where(stc => stc.StationId == s.Id && stc.CarId != null) && s.StreetId == streetId)).ToListAsync();
-        //}
-        public async Task<List<Station>> GetByNeighborhoodId(int streetId)
+        public async Task<Station> GetNearestStation(bool fullStation, Point point1, string street, string neighbornhood, string city)
         {
-            return await general.Stations.Where(s => s.StreetId == streetId && s.IsCenteral.Value).ToListAsync();
-        }
-        public async Task<List<Station>> GetByCityId(int streetId)
-        {
-            return await general.Stations.Where(s => s.StreetId == streetId && s.IsCenteral.Value).ToListAsync();
-        }
-        public async Task<Station> GetNearestStation(Point point1, string street, string neighbornhood, string city)
-        {
-
             List<Station> stationList;
-            stationList = await ReadAllAsync();
+            stationList = await GetStationsByStreet(fullStation, false, street);
+            if (stationList == null)
+            {
+                stationList = await GetStationsByNeighborhood(fullStation, false, neighbornhood);
+                if (stationList == null)
+                {
+                    stationList = await GetStationsByCity(fullStation, false, city);
+                    if (stationList == null)
+                    {
+                        if (fullStation)
+                            stationList = await GetAllFullStations();
+                        else
+                            stationList = await GetAllEmptyStations();
+                    }
+                }
+            }
+            return await FindNearestStationFromList(point1, stationList);
+        }
+        public async Task<List<Station>> GetStationsByStreet(bool fullStation, bool isMustCenteral, string street)
+        {
+            Street str = await general.Streets.Where(s => s.Name.Equals(street)).FirstOrDefaultAsync();
+            int streetId = str.Id;
+            if (isMustCenteral)
+                return await general.Stations.Where(s => (s.StreetId == streetId && s.StationToCars.First().CarId != null) == fullStation && s.IsCenteral == true).ToListAsync();
+            return await general.Stations.Where(s => (s.StreetId == streetId && s.StationToCars.First().CarId != null) == fullStation).ToListAsync();
+        }
+        public async Task<List<Station>> GetStationsByNeighborhood(bool fullStation, bool isMustCenteral, string neighborhood)
+        {
+            Neighborhood nbr = await general.Neighborhoods.Where(n => n.Name.Equals(neighborhood)).FirstOrDefaultAsync();
+            int neighborhoodId = nbr.Id;
+            if (isMustCenteral)
+                return await general.Stations.Where(s => (s.Street.NeigborhoodId == neighborhoodId && s.StationToCars.First().CarId != null) == fullStation && s.IsCenteral == true).ToListAsync();
+            return await general.Stations.Where(s => (s.Street.NeigborhoodId == neighborhoodId && s.StationToCars.First().CarId != null) == fullStation).ToListAsync();
+        }
+        public async Task<List<Station>> GetStationsByCity(bool fullStation, bool isMustCenteral, string city)
+        {
+            City ct = await general.Cities.Where(c => c.Name.Equals(city)).FirstOrDefaultAsync();
+            int cityId = ct.Id;
+            if (isMustCenteral)
+                return await general.Stations.Where(s => (s.Street.Neigborhood.CityId == cityId && s.StationToCars.First().CarId != null) == fullStation && s.IsCenteral == true).ToListAsync();
+            return await general.Stations.Where(s => (s.Street.Neigborhood.CityId == cityId && s.StationToCars.First().CarId != null) == fullStation).ToListAsync();
+        }
+        public async Task<List<Station>> GetAllFullStations()
+        {
+            return await general.Stations.Include(station => station.Street).ThenInclude(street => street.Neigborhood).ThenInclude(nei => nei.City).Where(st => st.StationToCars.First().CarId != null).ToListAsync<Station>();
+        }
+        public async Task<List<Station>> GetAllEmptyStations()
+        {
+            return await general.Stations.Include(station => station.Street).ThenInclude(street => street.Neigborhood).ThenInclude(nei => nei.City).Where(st => st.StationToCars.First().CarId == null).ToListAsync<Station>();
+        }
+        private async Task<Station> FindNearestStationFromList(Point point1, List<Station> stationList)
+        {
             Station nearestStation = new();
             double distance, minDistance = double.MaxValue;
+            Point point2;
             foreach (var st in stationList)
             {
-                Point point2=new Point() { X=st.X,Y=st.Y};
-                distance = GetDistance(point1,point2);
+                point2 = new Point() { X = st.X, Y = st.Y };
+                distance = GetDistance(point1, point2);
                 if (minDistance > distance)
                 {
                     minDistance = distance;
@@ -107,7 +146,25 @@ namespace Dal.Implemention
         }
         private static double GetDistance(Point point1, Point point2)
         {
-            return Math.Sqrt(Math.Pow(point1.X - point2.X, 2) + Math.Pow(point1.Y - point2.Y, 2));
+            return Math.Sqrt(Math.Pow(point2.X - point1.X, 2) + Math.Pow(point2.Y - point1.Y, 2));
+        }
+        public async Task<Station> GetNearestCenteralStation(Point point1, string street, string neighbornhood, string city)
+        {
+            List<Station> stationList;
+            stationList = await GetStationsByStreet(false, true, street);
+            if (stationList == null)
+            {
+                stationList = await GetStationsByNeighborhood(false, true, neighbornhood);
+                if (stationList == null)
+                {
+                    stationList = await GetStationsByCity(false, true, city);
+                    if (stationList == null)
+                    {
+                        stationList = await GetAllEmptyStations();
+                    }
+                }
+            }
+            return await FindNearestStationFromList(point1, stationList);
         }
     }
 }

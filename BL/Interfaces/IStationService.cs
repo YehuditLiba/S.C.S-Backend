@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace BL.Interfaces
 {
-    public interface IStationService:IService<StationDTO>
+    public interface IStationService
     {
         public Task<StationDTO> GetNearestStation(StationDTO stationDTO);
-        public Task<StationDTO> FindLucrativeStation(int numOfRentalHours, StationDTO stationDTO);
+        public Task<StationDTO> GetLucrativeStation(int numOfRentalHours, StationDTO stationDTO);
     }
 }
