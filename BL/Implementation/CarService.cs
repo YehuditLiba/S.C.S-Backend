@@ -32,11 +32,12 @@ namespace BL.Implementation
               return  await carRepository.DeleteAsync(id);
         }
 
-     public async Task<List<Car>> ReadAllAsync()
+        public async Task<List<CarDTO>> ReadAllAsync()
         {
-            return await general.Cars.ToListAsync<Car>();
+            List<Car> carsLst = await carRepository.ReadAllAsync();
+            List<CarDTO> carsDtoLst = mapper.Map<List<CarDTO>>(carsLst);
+            return carsDtoLst;
         }
-
         public Task<CarDTO> ReadByIdAsync(int id)
         {
             throw new NotImplementedException();
