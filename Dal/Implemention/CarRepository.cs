@@ -58,11 +58,10 @@ namespace Dal.Implemention
             }
         }
 
-        public Task<List<Car>> ReadAllAsync()
+       public async Task<List<Car>> ReadAllAsync()
         {
-            throw new NotImplementedException();
+            return await general.Cars.ToListAsync<Car>();
         }
-
         public Task<Car> ReadByIdAsync(int code)
         {
             throw new NotImplementedException();
