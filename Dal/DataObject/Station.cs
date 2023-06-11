@@ -20,4 +20,5 @@ public partial class Station
     public virtual ICollection<StationToCar> StationToCars { get; } = new List<StationToCar>();
 
     public virtual Street Street { get; set; } = null!;
+
 }
