@@ -23,6 +23,10 @@ namespace MyService.Controllers
         {
             return await carService.DeleteAsync(carId);
         }
-       
+         [HttpGet]
+        public async Task<List<CarDTO>> GetAllCars()
+        {
+            return await carService.ReadAllAsync();
+        }
     }
 }
