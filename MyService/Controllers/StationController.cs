@@ -6,9 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MyService.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class StationController : ControllerBase
+    public class StationController : ServiceController
     {
         IStationService stationService;
         public StationController(IStationService stationService)
@@ -16,11 +14,18 @@ namespace MyService.Controllers
             this.stationService = stationService;
         }
         [HttpGet]
-        public async Task<Station> GetNearestStation (int num,string street,string neighborhood, string city)
+        public async Task<StationDTO> GetNearestStation(int num, string street, string neighborhood, string city)
         {
-            StationAndStationDTO stationDTO= new StationAndStationDTO();
-            StationDTO station=new StationDTO(num, street, neighborhood, city);
-            return await stationService.GetNearestStation (station);
+            StationDTO stationDTO = new StationDTO(num, street, neighborhood, city);
+            return await stationService.GetNearestStation(stationDTO);
+        }
+        [HttpGet]
+        [Route("{numOfRentalHours}")]
+        public async Task<Station> FindLucrativeStation(int numOfRentalHours, [FromBody] int num, string street, string neighborhood, string city)
+        {
+            StationDTO station = new StationDTO(num, street, neighborhood, city);
+            return await stationService.FindLucrativeStation(numOfRentalHours, station);
         }
     }
 }
+
