@@ -12,6 +12,6 @@ namespace BL.Interfaces
     public interface IStationService
     {
         public Task<Station> GetNearestStation(StationDTO stationDTO);
-
+        public Task<Station> FindLucrativeStation(int numOfRentalHours, StationDTO stationDTO);
     }
 }
