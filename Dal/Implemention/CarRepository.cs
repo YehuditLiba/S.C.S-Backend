@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dal.DataObject;
 using Dal.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dal.Implemention
 {

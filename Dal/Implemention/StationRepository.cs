@@ -98,6 +98,8 @@ namespace Dal.Implemention
         public async Task<List<Station>> GetStationsByStreet(bool fullStation, bool isMustCenteral, string street)
         {
             Street str = await general.Streets.Where(s => s.Name.Equals(street)).FirstOrDefaultAsync();
+            if (str == null)
+                return null;
             int streetId = str.Id;
             if (isMustCenteral)
                 return await general.Stations.Where(s => (s.StreetId == streetId && s.StationToCars.First().CarId != null) == fullStation && s.IsCenteral == true).ToListAsync();
@@ -106,6 +108,8 @@ namespace Dal.Implemention
         public async Task<List<Station>> GetStationsByNeighborhood(bool fullStation, bool isMustCenteral, string neighborhood)
         {
             Neighborhood nbr = await general.Neighborhoods.Where(n => n.Name.Equals(neighborhood)).FirstOrDefaultAsync();
+            if (nbr == null)
+                return null;
             int neighborhoodId = nbr.Id;
             if (isMustCenteral)
                 return await general.Stations.Where(s => (s.Street.NeigborhoodId == neighborhoodId && s.StationToCars.First().CarId != null) == fullStation && s.IsCenteral == true).ToListAsync();
@@ -114,6 +118,8 @@ namespace Dal.Implemention
         public async Task<List<Station>> GetStationsByCity(bool fullStation, bool isMustCenteral, string city)
         {
             City ct = await general.Cities.Where(c => c.Name.Equals(city)).FirstOrDefaultAsync();
+            if (ct == null)
+                return null;
             int cityId = ct.Id;
             if (isMustCenteral)
                 return await general.Stations.Where(s => (s.Street.Neigborhood.CityId == cityId && s.StationToCars.First().CarId != null) == fullStation && s.IsCenteral == true).ToListAsync();
