@@ -15,9 +15,13 @@ namespace MyService.Controllers
         }
 
         [HttpPost]
-        public async Task<int> CreateUser([FromBody] UserDTO userDTO)
+        public async Task<int> CreateUser([FromBody] string name, string email, string password)
         {
-               return await userService.CreateAsync(userDTO);
+            UserDTO userDTO = new UserDTO();
+            userDTO.Name = name;
+            userDTO.Email = email;
+            userDTO.Password = password;
+            return await userService.CreateAsync(userDTO);
         }
         [HttpGet]
         public async Task<List<UserDTO>> GetUsers()
@@ -43,7 +47,5 @@ namespace MyService.Controllers
             // UserDTO userDTO = await userService.ReadByIdAsync(id);
             return await userService.DeleteAsync(id);
         }
-        ///////////////////////////////////////////////////
-        //////////////////////////////////////////////////
     }
 }
