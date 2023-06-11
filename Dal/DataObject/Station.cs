@@ -11,6 +11,8 @@ public partial class Station
 
     public double Y { get; set; }
 
+    public int? Number { get; set; }
+
     public int StreetId { get; set; }
 
     public bool? IsCenteral { get; set; }

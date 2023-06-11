@@ -13,12 +13,19 @@ namespace BL.DTO
         public string Street { get; set; }
         public string City { get; set; }
         public string Neighborhood { get; set; }
-        public StationDTO(int num, string street, string neighborhood, string city)
+        //להוסיף בDAL את NUMBER
+        public StationDTO(int number, string street, string neighborhood, string city)
         {
-            this.Number = num;
+            this.Number = number;
             this.Neighborhood = neighborhood;
             this.Street = street;
             this.City = city;
         }
+        //public StationDTO(string street, string neighborhood, string city)
+        //{
+        //    this.Neighborhood = neighborhood;
+        //    this.Street = street;
+        //    this.City = city;
+        //}
     }
 }

@@ -120,5 +120,10 @@ namespace BL.Implementation
             return null;
 
         }
+
+        //Task<Station> IStationService.GetNearestStation(StationDTO stationDTO)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }
