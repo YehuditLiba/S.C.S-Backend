@@ -65,7 +65,7 @@ namespace BL.Implementation
             return await stationRepository.GetNearestStation(point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
         }
 
-        public async Task<StationDTO> FindLucrativeStation(int numberOfRentalHours, StationDTO stationDTO)
+        public async Task<StationDTO> GetLucrativeStation(int numberOfRentalHours, StationDTO stationDTO)
         {
             const double NORMAL_WALKINK_DISTANCE_IN_KM = 1.00;
             const double AVERAGE_PRICE_OF_TAXI_FARE_FOR_KM = 13.5;
