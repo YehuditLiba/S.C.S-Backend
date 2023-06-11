@@ -24,18 +24,35 @@ namespace Dal.Implemention
 
         public async Task<bool> DeleteAsync(int carId)
         {
+            //try
+            //{
+            //    Car car = general.Cars.Find(carId);
+            //    general.Cars.RemoveRange(car);
+            //   // general.StationToCars.Remove();
+            //    await general.SaveChangesAsync();
+            //    return true;
+            //}
+            //catch
+            //{
+            //    return false;
+            //}
             try
             {
-                Car car = general.Cars.Find(carId);
-                if (car != null)
+                // Step 1: Update the StationToCar table to set CarId to NULL
+                var stationToCarEntries = general.StationToCars.Where(stc => stc.CarId == carId);
+                foreach (var entry in stationToCarEntries)
                 {
-                    general.Cars.Remove(car);
-                    await general.SaveChangesAsync();
+                    entry.CarId = null;
                 }
+
+                // Step 2: Remove the car from the Cars table
+                Car car = general.Cars.Find(carId);
+                general.Cars.Remove(car);
+
+                await general.SaveChangesAsync();
                 return true;
             }
-
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
