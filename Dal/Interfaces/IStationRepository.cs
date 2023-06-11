@@ -13,5 +13,6 @@ namespace Dal.Interfaces
     {
         public Task<Station> GetNearestStation(Point point, string street, string neighorhood, string city);
 
+        public Task<Station> GetNearestCenteralStation(Point point, string street, string neighorhood, string city);
     }
 }

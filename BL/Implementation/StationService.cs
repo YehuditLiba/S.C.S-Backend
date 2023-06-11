@@ -51,27 +51,60 @@ namespace BL.Implementation
         }
         #endregion''' 
 
-
+        //this public function return the nearest stationDTO:
         public async Task<StationDTO> GetNearestStation(StationDTO stationDTO)
         {
-            //I get stationDTO, convert it to a point, find the nearest station and return it as stationDTO
-            Point point = convertStationDTOToPoint(stationDTO);
-            //convert:
-
-            Station station = await stationRepository.GetNearestStation(point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
+            Station station = await FindNearestStation(stationDTO);
             return mapper.Map<StationDTO>(station);
+        }
+
+        //this private function return the nearest station:
+        private async Task<Station> FindNearestStation(StationDTO stationDTO)
+        {
+            Point point = convertStationDTOToPoint(stationDTO);
+            return await stationRepository.GetNearestStation(point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
         }
 
         public async Task<StationDTO> FindLucrativeStation(int numberOfRentalHours, StationDTO stationDTO)
         {
-            //get the nearest station and check: if it centeral-well, return it
-            //if not find the lucrative station and return it 
-            //Station station = mapper.Map<Station>(stationDTO);
-            //הלוגיקה צריכה להיות כאן!!!
-            //אם פחות מ??? ק"מ - אפשר ללכת רגלית
-            //אם אפילו נסיעה במונית יוצאת זול יותר מאשר לותר על ההנחה
-            throw new NotImplementedException();
+            const double NORMAL_WALKINK_DISTANCE_IN_KM = 1.00;
+            const double AVERAGE_PRICE_OF_TAXI_FARE_FOR_KM = 13.5;
+            Station lucrativeStation = new Station();
+            //if the nearest station is centeral - this is the lucrative Station, so return it:
+            Station nearestStation = await FindNearestStation(stationDTO);
+            if (nearestStation.IsCenteral.Value == true)
+            {
+                lucrativeStation = nearestStation;
+            }
+            //if not , find the nearest centeral station and check:
+            else
+            {
+                Point point = convertStationDTOToPoint(stationDTO);
+                Station nearestCenteralStation = await stationRepository.GetNearestCenteralStation(point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
+                //if it within walking distance - return it
+                double distance = (double)GetDistance(point, new Point() { X = nearestCenteralStation.X, Y = nearestCenteralStation.Y });
+                if (distance <= NORMAL_WALKINK_DISTANCE_IN_KM)
+                {
+                    lucrativeStation = nearestCenteralStation;
+                }
+                //or if average taxi fare is less than the discount - return it
+                else if (distance * AVERAGE_PRICE_OF_TAXI_FARE_FOR_KM <= (double)numberOfRentalHours)
+                {
+                    lucrativeStation = nearestCenteralStation;
+                }
+                //else - return the nearest station.
+                else
+                {
+                    lucrativeStation = nearestStation;
+                }
+            }
+            return mapper.Map<StationDTO>(lucrativeStation);
         }
+        private static double GetDistance(Point point1, Point point2)
+        {
+            return Math.Sqrt(Math.Pow(point2.X - point1.X, 2) + Math.Pow(point2.Y - point1.Y, 2));
+        }
+
         const string API_KEY = "AIzaSyBFwHxGY47K0J1ECt99_TZA7aVO62ztUp0";
         const string BASE_URL = "https://maps.googleapis.com/maps/api/geocode/json";
         private Point convertStationDTOToPoint(StationDTO stationDTO)
@@ -120,10 +153,5 @@ namespace BL.Implementation
             return null;
 
         }
-
-        //Task<Station> IStationService.GetNearestStation(StationDTO stationDTO)
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
 }

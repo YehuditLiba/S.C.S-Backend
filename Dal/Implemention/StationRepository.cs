@@ -76,6 +76,10 @@ namespace Dal.Implemention
         #endregion
         //public async Task<List<Station>> GetByStreetId(int streetId)
         //{
+        //    //1.
+        //    //לשלוף רק את התחנות שבאותו רחוב
+        //    //2.
+        //    //מתוכם לשלוף רק את התחנות שיש בהם רכב
         //    return await general.Stations.Where(s => (s.StationToCars.Where(stc => stc.StationId == s.Id && stc.CarId != null) && s.StreetId == streetId)).ToListAsync();
         //}
         public async Task<List<Station>> GetByNeighborhoodId(int streetId)
@@ -86,16 +90,18 @@ namespace Dal.Implemention
         {
             return await general.Stations.Where(s => s.StreetId == streetId && s.IsCenteral.Value).ToListAsync();
         }
-        public async Task<Station> GetNearestStation(Point point, string street, string neighbornhood, string city)
+        public async Task<Station> GetNearestStation(Point point1, string street, string neighbornhood, string city)
         {
 
             List<Station> stationList;
             stationList = await ReadAllAsync();
             Station nearestStation = new();
             double distance, minDistance = double.MaxValue;
+            Point point2;
             foreach (var st in stationList)
             {
-                distance = GetDistance(point.X, point.Y, st.X, st.Y);
+                point2 = new Point() { X = st.X, Y = st.Y };
+                distance = GetDistance(point1, point2);
                 if (minDistance > distance)
                 {
                     minDistance = distance;
@@ -104,9 +110,32 @@ namespace Dal.Implemention
             }
             return nearestStation;
         }
-        private static double GetDistance(double x1, double y1, double x2, double y2)
+        private static double GetDistance(Point point1, Point point2)
         {
-            return Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
+            return Math.Sqrt(Math.Pow(point2.X - point1.X, 2) + Math.Pow(point2.Y - point1.Y, 2));
         }
+        public async Task<Station> GetNearestCenteralStation(Point point1, string street, string neighorhood, string city)
+        {
+            List<Station> stationList;
+            stationList = await ReadAllAsync();
+            Station nearestCenteralStation = new();
+            double distance, minDistance = double.MaxValue;
+            Point point2;
+            foreach (var st in stationList)
+            {
+                if (st.IsCenteral.Value == true)
+                {
+                    point2 = new Point() { X = st.X, Y = st.Y };
+                    distance = GetDistance(point1, point2);
+                    if (minDistance > distance)
+                    {
+                        minDistance = distance;
+                        nearestCenteralStation = st;
+                    }
+                }
+            }
+            return nearestCenteralStation;
+        }
+
     }
 }
