@@ -1,41 +1,38 @@
 ﻿using AutoMapper;
 using BL.DTO;
 using Dal.DataObject;
-using GoogleMaps.LocationServices;
+using Dal.Interfaces;
+//using GoogleMaps.LocationServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+//using GoogleMapsApi;
+using System.Security.Policy;
+using static System.Net.WebRequestMethods;
+using System.Net;
 
 namespace BL.profiles
 {
     public class StationAndStationDTO : Profile
     {
+        // {  .ForMember(d => d.Id, o => o.MapFrom(s => s.AppUserId))
+        //.ForMember(d => d.UserName, o => o.MapFrom(s => s.AppUser.UserName))
+        //.ForMember(d => d.DateJoined, o => o.MapFrom(s => s.DateJoined));
+
         public StationAndStationDTO()
         {
-            GetLocation(new StationDTO(21,"mintz", "ramot", "jerusalem")) ;
-            //   CreateMap<StationDTO, Station>().ForMember(sDTO=>getStation(sDTO));
+            CreateMap<Station, StationDTO>().ForMember(station => station.Street, o => o.MapFrom(s => s.Street.Name))
+            .ForMember(n => n.Neighborhood, o => o.MapFrom(s => s.Street.Neigborhood.Name))
+            .ForMember(c => c.City, o => o.MapFrom(s => s.Street.Neigborhood.City.Name))
+            .ConstructUsing((src, ctx) => new StationDTO(
+                src.Number.Value,
+                src.Street.Name,
+                src.Street.Neigborhood.Name,
+                src.Street.Neigborhood.City.Name));
+            //  .ConstructUsing(s => new StationDTO());
         }
-        private void GetLocation(StationDTO stationDTO)
-        {
-            string address = stationDTO.Street + stationDTO.Number + stationDTO.Neighborhood + stationDTO.City + "Israel";
-            string apiKey = "AIzaSyBFwHxGY47K0J1ECt99_TZA7aVO62ztUp0";
-            var locationService = new GoogleLocationService(apiKey);
-            var point = locationService.GetLatLongFromAddress(address);
-
-            var latitude = point.Latitude;
-            var longitude = point.Longitude;
-        }
-
     }
-
 }
-//CreateMap<Book, BookDTO>()
-//    .ForMember(
-//    bDto => bDto.Author,
-//    options => options.MapFrom(b => b.Author == null ? "" : b.Author.FirstName + " " + b.Author.LastName))
-//    .ReverseMap()
-//    .ForMember(b => b.Category, opts => opts.Ignore())
-//    .ForPath(b => b.Author.FirstName, opts =>         opts.MapFrom(b => b.Author.Split(" ", System.StringSplitOptions.None)[0]))
-//    .ForPath(b => b.Author.LastName, opts => opts.MapFrom(b => b.Author.Split(" ", System.StringSplitOptions.None)[1]));
+//ForMember(station => station.Street, opt => opt.MapFrom(src => src.Street.Name)
