@@ -15,9 +15,10 @@ namespace BL
     {
         public static void AddAppServices(this IServiceCollection services)
         {
-            services.AddScoped<IStationService,StationService>();
+            services.AddScoped<IStationService, StationService>();
             services.AddScoped<IUserService, UserService>();
             services.AddAutoMapper(typeof(UserAndUserDTO));
+            services.AddAutoMapper(typeof(StationAndStationDTO));
             services.AddRepositories();
         }
     }
