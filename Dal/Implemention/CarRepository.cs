@@ -59,7 +59,7 @@ namespace Dal.Implemention
             }
         }
 
-       public async Task<List<Car>> ReadAllAsync()
+        public async Task<List<Car>> ReadAllAsync()
         {
             return await general.Cars.ToListAsync<Car>();
         }
@@ -71,6 +71,31 @@ namespace Dal.Implemention
         public Task<bool> UpdateAsync(Car newItem)
         {
             throw new NotImplementedException();
+        }
+        public async Task<bool> ChangeTheCarModeAsync(int carId)
+        {
+            try
+            {
+                Car car = await general.Cars.FirstOrDefaultAsync(c => c.Id == carId);
+
+                if (car != null)
+                {
+                    car.IsAvailable = !car.IsAvailable; // Toggle the availability
+                    await general.SaveChangesAsync();
+                    return true; // Update successful
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions that occurred during the update
+                Console.WriteLine($"An error occurred while toggling the car availability: {ex.Message}");
+                return false; // Update failed
+            }
+
         }
     }
 }

@@ -145,27 +145,9 @@ namespace Dal.Implemention
             return await general.Stations.Include(station => station.Street).ThenInclude(street => street.Neigborhood).ThenInclude(nei => nei.City).Where(st => st.StationToCars.First().CarId == null).ToListAsync<Station>();
         }
         #endregion
-        //public async Task<Station> GetNearestCenteralStation(Point point1, string street, string neighbornhood, string city)
-        //{
-        //    List<Station> stationList;
-        //    stationList = await GetStationsByStreet(false, true, street);
-        //    if (stationList == null)
-        //    {
-        //        stationList = await GetStationsByNeighborhood(false, true, neighbornhood);
-        //        if (stationList == null)
-        //        {
-        //            stationList = await GetStationsByCity(false, true, city);
-        //            if (stationList == null)
-        //            {
-        //                stationList = await GetAllEmptyStations();
-        //            }
-        //        }
-        //    }
-        //    return await FindNearestStationFromList(point1, stationList);
-        //}
         private async Task<Station> FindNearestStationFromList(Point point1, List<Station> stationList)
         {
-            Station nearestStation = new();
+            Station nearestStation = new Station();
             double distance, minDistance = double.MaxValue;
             Point point2;
             foreach (var st in stationList)
