@@ -62,24 +62,22 @@ namespace BL.Implementation
         }
         public async Task<StationDTO> GetLucrativeStation(int numberOfRentalHours, StationDTO stationDTO)
         {
-            //לבדוק מה קורה עם מחרי מוניות
-            //לבדוק מחיר ממוצע לנסיעה 
-            //מחיר לפי שעות או ק"מ או רכב
+            //לברר מחיר ממוצע לק"מ בנסיעה במונית
+            // לקבוע מחיר לנסיעה ברכב שיתופי ליום או לשעה
             //ממוצע הליכה
             //לעשות הרבה יותר תחנות מאשר רכבים
             //לסדר את זה שכשלקוח מכניס תחנת יעד הוא מקבל גם תחנה קרובה וגם תחנה ריווחית
             //אם זה אותה תחנה מחזיר רק את התחנה הזאת
-            //להחזיר בבדי של הרספונס את הדרך מהתחנה הריווחית ליעד - מונית או ברגל
+            //להחזיר בבדי של הרספונס את הדרך מהתחנה הריווחית ליעד - מונית או ברגל וגם את הסכום
 
-
-            //מתי המערכת מעדכנת רכב שמוחזר האם בהזמנה או האם בהחזרה בפועל
             //לעשות את כל הקרוד של סטיישן
             // לעשות פוט של יוזר
             //לתקן את הפונקציות בסטיישןרפוזיטורי של גישה לדיבי
             //להוסיף ליוזר פרטי אשראי
-            //לקוח נכנס למערכת- לוג אין או סיין אפ
-            //לקוח אומר תחנת מקור, מקדמה נגבית 
-            //
+            //להוסיף טבלת היסטורית נסיעות- תחנה והאם זה לקיחה או החזרה ושעה, לכל נסיעה יש מצביע ליוזר
+            //לעשות אובזרבר שבודק כל יום אם יש מישהו שעבר לו חודש
+            //ואם כן לטפל בו
+            //אהה וגם לבנות ריאקט🤔
             const double NORMAL_WALKINK_DISTANCE_IN_KM = 1.00;
             const double AVERAGE_PRICE_OF_TAXI_FARE_FOR_KM = 13.5;
             const int DISCOUNT_PERCENTAGE = 20;
