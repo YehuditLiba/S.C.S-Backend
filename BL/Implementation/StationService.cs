@@ -4,6 +4,7 @@ using BL.Interfaces;
 using Dal.DataObject;
 using Dal.Interfaces;
 using GoogleMaps.LocationServices;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -61,8 +62,32 @@ namespace BL.Implementation
         }
         public async Task<StationDTO> GetLucrativeStation(int numberOfRentalHours, StationDTO stationDTO)
         {
+            //לבדוק מה קורה עם מחרי מוניות
+            //לבדוק מחיר ממוצע לנסיעה 
+            //מחיר לפי שעות או ק"מ או רכב
+            //ממוצע הליכה
+            //לעשות הרבה יותר תחנות מאשר רכבים
+            //לסדר את זה שכשלקוח מכניס תחנת יעד הוא מקבל גם תחנה קרובה וגם תחנה ריווחית
+            //אם זה אותה תחנה מחזיר רק את התחנה הזאת
+            //להחזיר בבדי של הרספונס את הדרך מהתחנה הריווחית ליעד - מונית או ברגל
+
+
+            //מתי המערכת מעדכנת רכב שמוחזר האם בהזמנה או האם בהחזרה בפועל
+            //לעשות את כל הקרוד של סטיישן
+            // לעשות פוט של יוזר
+            //לתקן את הפונקציות בסטיישןרפוזיטורי של גישה לדיבי
+            //להוסיף ליוזר פרטי אשראי
+            //לקוח נכנס למערכת- לוג אין או סיין אפ
+            //לקוח אומר תחנת מקור, מקדמה נגבית 
+            //
             const double NORMAL_WALKINK_DISTANCE_IN_KM = 1.00;
             const double AVERAGE_PRICE_OF_TAXI_FARE_FOR_KM = 13.5;
+            const int DISCOUNT_PERCENTAGE = 20;
+            double PRICE_PER_HOUR;
+            if (DateTime.Now.Month==7|| DateTime.Now.Month==8)
+                PRICE_PER_HOUR =2;
+            else
+                PRICE_PER_HOUR =2;
             Station lucrativeStation = new Station();
             Point point = convertStationDTOToPoint(stationDTO);
             // I want the nearest station that is:

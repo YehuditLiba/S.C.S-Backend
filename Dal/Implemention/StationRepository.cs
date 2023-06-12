@@ -108,7 +108,7 @@ namespace Dal.Implemention
         
         public async Task<List<Station>> GetStationsByStreet(bool fullStation, bool isMustCenteral, string street)
         {
-            Street str = await general.Streets.Where(s => s.Name.Equals(street)).FirstOrDefaultAsync();
+            Street str = await general.Streets.Where(s => s.Name.Equals(street)).FirstAsync();
             if (str == null)
                 return null;
             int streetId = str.Id;
