@@ -78,6 +78,7 @@ namespace BL.Implementation
             //לעשות אובזרבר שבודק כל יום אם יש מישהו שעבר לו חודש
             //ואם כן לטפל בו
             //אהה וגם לבנות ריאקט🤔
+            //תודה דסי על הערות
             const double NORMAL_WALKINK_DISTANCE_IN_KM = 1.00;
             const double AVERAGE_PRICE_OF_TAXI_FARE_FOR_KM = 13.5;
             const int DISCOUNT_PERCENTAGE = 20;
