@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using BL.DTO;
 using BL.Interfaces;
+using Dal.DalImplements;
 using Dal.DataObject;
 using Dal.Interfaces;
 
@@ -38,9 +39,11 @@ namespace BL.Implementation
             List<CarDTO> carsDtoLst = mapper.Map<List<CarDTO>>(carsLst);
             return carsDtoLst;
         }
-        public Task<CarDTO> ReadByIdAsync(int id)
+        public async Task<CarDTO> ReadByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            Car car = await carRepository.ReadByIdAsync(id);
+            CarDTO carDTO = mapper.Map<CarDTO>(car);
+            return carDTO;
         }
 
         public Task<bool> UpdateAsync(CarDTO newItem)

@@ -63,9 +63,9 @@ namespace Dal.Implemention
         {
             return await general.Cars.ToListAsync<Car>();
         }
-        public Task<Car> ReadByIdAsync(int code)
+        public async Task<Car> ReadByIdAsync(int code)
         {
-            throw new NotImplementedException();
+            return await general.Cars.FirstAsync(c => c.Id == code);
         }
 
         public Task<bool> UpdateAsync(Car newItem)
