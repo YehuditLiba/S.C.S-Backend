@@ -50,37 +50,25 @@ namespace BL.Implementation
             throw new NotImplementedException();
         }
         #endregion''' 
-
-        //this public function return the nearest stationDTO:
         public async Task<StationDTO> GetNearestStation(StationDTO stationDTO)
         {
-            Station station = await FindNearestStation(stationDTO);
+            Point point = convertStationDTOToPoint(stationDTO);
+            // I want the nearest station that is:
+            // full (fullStation = true)
+            // does not matter centeral or not (isMustCenteral = false)
+            Station station = await stationRepository.GetNearestStation(true, false, point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
             return mapper.Map<StationDTO>(station);
         }
-
-        //this private function return the nearest station:
-        private async Task<Station> FindNearestStation(StationDTO stationDTO)
-        {
-            Point point = convertStationDTOToPoint(stationDTO);
-            return await stationRepository.GetNearestStation(false, point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
-        }
-
         public async Task<StationDTO> GetLucrativeStation(int numberOfRentalHours, StationDTO stationDTO)
         {
             const double NORMAL_WALKINK_DISTANCE_IN_KM = 1.00;
             const double AVERAGE_PRICE_OF_TAXI_FARE_FOR_KM = 13.5;
             Station lucrativeStation = new Station();
-            //if the nearest station is centeral - this is the lucrative Station, so return it:
-            Station nearestStation = await FindNearestStation(stationDTO);
-            if (nearestStation.IsCenteral.Value == true)
-            {
-                lucrativeStation = nearestStation;
-            }
-            //if not , find the nearest centeral station and check:
-            else
-            {
-                Point point = convertStationDTOToPoint(stationDTO);
-                Station nearestCenteralStation = await stationRepository.GetNearestCenteralStation(point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
+            Point point = convertStationDTOToPoint(stationDTO);
+            // I want the nearest station that is:
+            // empty (fullStation = false)
+            // centeral (isMustCenteral = true)
+            Station nearestCenteralStation = await stationRepository.GetNearestStation(false, true, point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
                 //if it within walking distance - return it
                 double distance = (double)GetDistance(point, new Point() { X = nearestCenteralStation.X, Y = nearestCenteralStation.Y });
                 if (distance <= NORMAL_WALKINK_DISTANCE_IN_KM)
@@ -92,12 +80,12 @@ namespace BL.Implementation
                 {
                     lucrativeStation = nearestCenteralStation;
                 }
-                //else - return the nearest station.
+                //else - return the nearest station
+                //that empty and not centeral
                 else
                 {
-                    lucrativeStation = nearestStation;
+                lucrativeStation = await stationRepository.GetNearestStation(false, false, point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
                 }
-            }
             return mapper.Map<StationDTO>(lucrativeStation);
         }
         private static double GetDistance(Point point1, Point point2)
@@ -123,14 +111,16 @@ namespace BL.Implementation
                 dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(responseJson);
                 if (result.status == "OK")
                 {
-                    point.X = result.results[0].geometry.bounds.northeast.lat;
-                    point.Y = result.results[0].geometry.bounds.northeast.lng;
+                    point.X = result.results[0].geometry.location.lat;
+                    point.Y = result.results[0].geometry.location.lng;
                     //the next lines will change the object stationDTO, because the function got it as a reference type
 
                     //stationDTO.Number=result.results[0].geometry.number;
-                    //stationDTO.Street = result.results[0].geometry.bounds.northeast;
-                    //stationDTO.Neighborhood = result.results[0].geometry.bounds.northeast;
-                    //stationDTO.City = result.results[0].geometry.bounds.northeast;
+                    stationDTO.Number = 0;
+                    stationDTO.Street = result.results[0].address_components[0].short_name;
+                    //stationDTO.Neighborhood = result.results[0].address_components[1].short_name;
+                    stationDTO.Neighborhood = null;
+                    stationDTO.City = result.results[0].address_components[1].short_name;
 
                     //locationFromGoogleMaps = new StationDTO (result[1]???????????,result[0].?????,???,???);
                 }
@@ -146,12 +136,6 @@ namespace BL.Implementation
                 stationDTO.City = "Jerusalem";
             }
             return point;
-        }
-        private StationDTO convertPointToStationDTO(Point point)
-        {
-            Station station = new Station();
-            return null;
-
         }
     }
 }
