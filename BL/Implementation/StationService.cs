@@ -7,6 +7,7 @@ using GoogleMaps.LocationServices;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -60,11 +61,8 @@ namespace BL.Implementation
             Station station = await stationRepository.GetNearestStation(true, false, point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
             return mapper.Map<StationDTO>(station);
         }
-        public async Task<StationDTO> GetLucrativeStation(int numberOfRentalHours, StationDTO stationDTO)
+        public async Task<StationDTO> GetLucrativeStation(int numberOfRentalDays, StationDTO stationDTO)
         {
-            //לברר מחיר ממוצע לק"מ בנסיעה במונית
-            // לקבוע מחיר לנסיעה ברכב שיתופי ליום או לשעה
-            //ממוצע הליכה
             //לעשות הרבה יותר תחנות מאשר רכבים
             //לסדר את זה שכשלקוח מכניס תחנת יעד הוא מקבל גם תחנה קרובה וגם תחנה ריווחית
             //אם זה אותה תחנה מחזיר רק את התחנה הזאת
@@ -79,37 +77,59 @@ namespace BL.Implementation
             //ואם כן לטפל בו
             //אהה וגם לבנות ריאקט🤔
             //תודה דסי על הערות
-            const double NORMAL_WALKINK_DISTANCE_IN_KM = 1.00;
-            const double AVERAGE_PRICE_OF_TAXI_FARE_FOR_KM = 13.5;
-            const int DISCOUNT_PERCENTAGE = 20;
-            double PRICE_PER_HOUR;
-            if (DateTime.Now.Month==7|| DateTime.Now.Month==8)
-                PRICE_PER_HOUR =2;
+
+            double discount = 0.2;
+            //double price_per_hour;
+            double price_per_day;
+            //תעריף שונה לחודשים יולי אוגוסט
+            if (DateTime.Now.Month == 7 || DateTime.Now.Month == 8)
+                price_per_day = 150;
             else
-                PRICE_PER_HOUR =2;
+                price_per_day = 105;
+            double normal_wolking_distance_in_km = 0.9;
+            double avg_price_of_taxi_fare_for_km;
+            //תעריף א
+            if ((DateTime.Now.Day > 0 && DateTime.Now.Day < 6 && DateTime.Now.Hour > 5 && DateTime.Now.Hour < 22) ||
+                (DateTime.Now.Day == 6 && DateTime.Now.Hour > 5 && DateTime.Now.Hour < 17))
+            {
+                avg_price_of_taxi_fare_for_km = 1.86;
+            }
+            //תעריף ב
+            else if (((DateTime.Now.Day > 0 && DateTime.Now.Day < 5) && (DateTime.Now.Hour > 21 || DateTime.Now.Hour < 6)) ||
+                (DateTime.Now.Day == 5 && DateTime.Now.Hour > 9 && DateTime.Now.Hour < 23) ||
+                (DateTime.Now.Day == 6 && DateTime.Now.Hour > 15 && DateTime.Now.Hour < 19))
+            {
+                avg_price_of_taxi_fare_for_km = 2.22;
+            }
+            //תעריף ג
+            else
+            {
+                avg_price_of_taxi_fare_for_km = 2.26;
+            }
+            double initial_state_of_counter = 11.85;
             Station lucrativeStation = new Station();
             Point point = convertStationDTOToPoint(stationDTO);
             // I want the nearest station that is:
             // empty (fullStation = false)
             // centeral (isMustCenteral = true)
             Station nearestCenteralStation = await stationRepository.GetNearestStation(false, true, point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
-                //if it within walking distance - return it
-                double distance = (double)GetDistance(point, new Point() { X = nearestCenteralStation.X, Y = nearestCenteralStation.Y });
-                if (distance <= NORMAL_WALKINK_DISTANCE_IN_KM)
-                {
-                    lucrativeStation = nearestCenteralStation;
-                }
-                //or if average taxi fare is less than the discount - return it
-                else if (distance * AVERAGE_PRICE_OF_TAXI_FARE_FOR_KM <= (double)numberOfRentalHours)
-                {
-                    lucrativeStation = nearestCenteralStation;
-                }
-                //else - return the nearest station
-                //that empty and not centeral
-                else
-                {
+            //if it within walking distance - return it
+            double distance = (double)GetDistance(point, new Point() { X = nearestCenteralStation.X, Y = nearestCenteralStation.Y });
+            if (distance <= normal_wolking_distance_in_km)
+            {
+                lucrativeStation = nearestCenteralStation;
+            }
+            //or if average taxi fare is less than the discount - return it
+            else if (initial_state_of_counter + (distance * avg_price_of_taxi_fare_for_km) <= (double) discount * numberOfRentalDays * price_per_day)
+            {
+                lucrativeStation = nearestCenteralStation;
+            }
+            //else - return the nearest station
+            //that empty and not centeral
+            else
+            {
                 lucrativeStation = await stationRepository.GetNearestStation(false, false, point, stationDTO.Street, stationDTO.Neighborhood, stationDTO.City);
-                }
+            }
             return mapper.Map<StationDTO>(lucrativeStation);
         }
         private static double GetDistance(Point point1, Point point2)
