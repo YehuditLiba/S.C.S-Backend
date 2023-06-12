@@ -28,5 +28,11 @@ namespace MyService.Controllers
         {
             return await carService.ReadAllAsync();
         }
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<CarDTO> GetCarById(int id)
+        {
+            return await carService.ReadByIdAsync(id);
+        }
     }
 }
