@@ -63,21 +63,6 @@ namespace BL.Implementation
         }
         public async Task<StationDTO> GetLucrativeStation(int numberOfRentalDays, StationDTO stationDTO)
         {
-            //לעשות הרבה יותר תחנות מאשר רכבים
-            //לסדר את זה שכשלקוח מכניס תחנת יעד הוא מקבל גם תחנה קרובה וגם תחנה ריווחית
-            //אם זה אותה תחנה מחזיר רק את התחנה הזאת
-            //להחזיר בבדי של הרספונס את הדרך מהתחנה הריווחית ליעד - מונית או ברגל וגם את הסכום
-
-            //לעשות את כל הקרוד של סטיישן
-            // לעשות פוט של יוזר
-            //לתקן את הפונקציות בסטיישןרפוזיטורי של גישה לדיבי
-            //להוסיף ליוזר פרטי אשראי
-            //להוסיף טבלת היסטורית נסיעות- תחנה והאם זה לקיחה או החזרה ושעה, לכל נסיעה יש מצביע ליוזר
-            //לעשות אובזרבר שבודק כל יום אם יש מישהו שעבר לו חודש
-            //ואם כן לטפל בו
-            //אהה וגם לבנות ריאקט🤔
-            //תודה דסי על הערות
-
             double discount = 0.2;
             //double price_per_hour;
             double price_per_day;
