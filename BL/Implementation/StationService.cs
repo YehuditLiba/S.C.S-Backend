@@ -63,35 +63,11 @@ namespace BL.Implementation
         }
         public async Task<StationDTO> GetLucrativeStation(int numberOfRentalDays, StationDTO stationDTO)
         {
-            double discount = 0.2;
-            //double price_per_hour;
-            double price_per_day;
-            //תעריף שונה לחודשים יולי אוגוסט
-            if (DateTime.Now.Month == 7 || DateTime.Now.Month == 8)
-                price_per_day = 150;
-            else
-                price_per_day = 105;
-            double normal_wolking_distance_in_km = 0.9;
-            double avg_price_of_taxi_fare_for_km;
-            //תעריף א
-            if ((DateTime.Now.Day > 0 && DateTime.Now.Day < 6 && DateTime.Now.Hour > 5 && DateTime.Now.Hour < 22) ||
-                (DateTime.Now.Day == 6 && DateTime.Now.Hour > 5 && DateTime.Now.Hour < 17))
-            {
-                avg_price_of_taxi_fare_for_km = 1.86;
-            }
-            //תעריף ב
-            else if (((DateTime.Now.Day > 0 && DateTime.Now.Day < 5) && (DateTime.Now.Hour > 21 || DateTime.Now.Hour < 6)) ||
-                (DateTime.Now.Day == 5 && DateTime.Now.Hour > 9 && DateTime.Now.Hour < 23) ||
-                (DateTime.Now.Day == 6 && DateTime.Now.Hour > 15 && DateTime.Now.Hour < 19))
-            {
-                avg_price_of_taxi_fare_for_km = 2.22;
-            }
-            //תעריף ג
-            else
-            {
-                avg_price_of_taxi_fare_for_km = 2.26;
-            }
-            double initial_state_of_counter = 11.85;
+            double discount = PriceDetermination.Discount();
+            double price_per_day = PriceDetermination.Price_per_day();
+            double normal_wolking_distance_in_km = PriceDetermination.Normal_wolking_distance_in_km();
+            double avg_price_of_taxi_fare_for_km = PriceDetermination.Avg_price_of_taxi_fare_for_km();
+            double initial_state_of_counter = PriceDetermination.Initial_state_of_counter();
             Station lucrativeStation = new Station();
             Point point = convertStationDTOToPoint(stationDTO);
             // I want the nearest station that is:
