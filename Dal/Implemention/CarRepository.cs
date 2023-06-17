@@ -25,18 +25,6 @@ namespace Dal.Implemention
 
         public async Task<bool> DeleteAsync(int carId)
         {
-            //try
-            //{
-            //    Car car = general.Cars.Find(carId);
-            //    general.Cars.RemoveRange(car);
-            //   // general.StationToCars.Remove();
-            //    await general.SaveChangesAsync();
-            //    return true;
-            //}
-            //catch
-            //{
-            //    return false;
-            //}
             try
             {
                 // Step 1: Update the StationToCar table to set CarId to NULL
@@ -70,6 +58,7 @@ namespace Dal.Implemention
 
         public Task<bool> UpdateAsync(Car newItem)
         {
+            //details of car will never change
             throw new NotImplementedException();
         }
         public async Task<bool> ChangeTheCarModeAsync(int carId)

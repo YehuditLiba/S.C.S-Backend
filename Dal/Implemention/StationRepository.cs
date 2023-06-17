@@ -19,12 +19,33 @@ namespace Dal.Implemention
             this.general = general;
         }
         #region basic-CRUD
-
+        //in create station we have to check:
+        //if the station street is exsist in the streets table so the station streetId is its id
+        //but if not we have to add new street in the streets table
+        //in neughbirhood and city is like this
         public async Task<int> CreateAsync(Station station)
         {
             var newStation = general.Stations.Add(station);
+            //int id = -1;
+            //id = FindStreetAsync(station.Street.Name);
+            //if(id == -1)
+            //{
+            //    general.Streets.Add(station.Street);
+            //}
             await general.SaveChangesAsync();
             return newStation.Entity.Id;
+        }
+        private int FindStreetAsync (string street)
+        {
+            return 0;
+        }
+        private int FindNeighborhoodAsync(string street)
+        {
+            return 0;
+        }
+        private int FindCityAsync(string street)
+        {
+            return 0;
         }
 
         public async Task<bool> DeleteAsync(int stationId)

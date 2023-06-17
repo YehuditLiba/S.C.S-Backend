@@ -26,6 +26,38 @@ namespace MyService.Controllers
             StationDTO stationDTO = new StationDTO(num, street, neighborhood, city);
             return await stationService.GetLucrativeStation(numOfRentalHours, stationDTO);
         }
+        [HttpGet]
+        [Route("{getAll}")]
+        public async Task<List<StationDTO>> GetAllAsync(string getAll = null)
+        {
+            return await stationService.ReadAllAsync();
+        }
+        //can not do the next lines because it is the same route to the function FindLucrativeStation
+        
+        //[HttpGet]
+        //[Route("{id}")]
+        //public async Task<Station>GetByIdAsync (int id)
+        //{
+        //    return await stationService.ReadByIdAsync(id);
+        //}
+
+        [HttpPost]
+        public async Task<int> CreateAsync(int num , string street , string neighborhood , string city)
+        {
+            StationDTO stationDTO = new StationDTO(num , street , neighborhood , city);
+            return await stationService.CreateAsync(stationDTO);
+        }
+        [HttpPut]
+        public async Task<bool> UpdateAsync (StationDTO stationDTO)
+        {
+            return await stationService.UpdateAsync(stationDTO);
+        }
+        [HttpDelete]
+        public async Task<bool> DeleteAsync (int id)
+        {
+            return await stationService.DeleteAsync(id);  
+        }
+ 
     }
 }
 
