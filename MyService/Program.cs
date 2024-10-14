@@ -1,3 +1,4 @@
+using AutoMapper;
 using BL;
 using BL.Implementation;
 using BL.Interfaces;
@@ -19,6 +20,11 @@ builder.Services.AddAppServices();
 
 var provider=builder.Services.BuildServiceProvider();
 var configuration=provider.GetRequiredService<IConfiguration>();
+
+//check AutoMapper
+var mapper = provider.GetRequiredService<AutoMapper.IMapper>();
+mapper.ConfigurationProvider.AssertConfigurationIsValid();  
+
 
 var app = builder.Build();
 //app.AddSingleton<IStationService, StationService>();
