@@ -69,9 +69,27 @@ namespace Dal.Implemention
 
                 if (car != null)
                 {
-                    car.IsAvailable = !car.IsAvailable; // Toggle the availability
-                    await general.SaveChangesAsync();
-                    return true; // Update successful
+                    switch (car.Status)
+                    {
+                        case CarStatus.Available:
+                            car.Status = CarStatus.Taken;
+                            break;
+                        case CarStatus.Taken:
+                            car.Status = CarStatus.Returned;
+                            break;
+                        case CarStatus.Returned:
+                            car.Status = CarStatus.Available;
+                            break;
+                        case CarStatus.Reserved:
+                            car.Status = CarStatus.Available;
+                            break;
+                            
+                        default:
+                            throw new ArgumentOutOfRangeException("Unknown car status");
+                    }
+                //    car.IsAvailable = !car.IsAvailable; // Toggle the availability
+                   await general.SaveChangesAsync();
+                   return true; // Update successful
                 }
                 else
                 {

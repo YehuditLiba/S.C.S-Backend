@@ -43,6 +43,14 @@ public partial class General : DbContext
                 .HasMaxLength(1)
                 .IsUnicode(false)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            //Add Parse Type Status
+            entity.Property(e => e.Status)
+                .HasConversion
+                (
+                v => v.ToString(),
+                 //   v => (CarStatus)Enum.Parse(typeof(CarStatus), v)
+                 v => Enum.Parse<CarStatus>(v)
+          );
         });
 
         modelBuilder.Entity<City>(entity =>
