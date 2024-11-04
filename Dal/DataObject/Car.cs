@@ -26,4 +26,5 @@ public partial class Car
     public CarStatus Status { get; set; }
 
     public virtual StationToCar? StationToCar { get; set; }
+    public virtual ICollection<Rentals> Rentals { get; set; }
 }

@@ -9,5 +9,7 @@ public partial class City
 
     public string Name { get; set; } = null!;
 
+   
     public virtual ICollection<Neighborhood> Neighborhoods { get; } = new List<Neighborhood>();
+    public virtual ICollection<Rentals> Rentals { get; set; }
 }
