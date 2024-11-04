@@ -18,7 +18,7 @@ namespace Dal.Implemention
         }
         public async Task<int> CreateAsync(Car item)
         {
-            var newCar = general.Cars.Add(item);
+            var newCar = general.Car.Add(item);
             await general.SaveChangesAsync();
             return newCar.Entity.Id;
         }
@@ -35,8 +35,8 @@ namespace Dal.Implemention
                 }
 
                 // Step 2: Remove the car from the Cars table
-                Car car = general.Cars.Find(carId);
-                general.Cars.Remove(car);
+                Car car = general.Car.Find(carId);
+                general.Car.Remove(car);
 
                 await general.SaveChangesAsync();
                 return true;
@@ -49,11 +49,11 @@ namespace Dal.Implemention
 
         public async Task<List<Car>> ReadAllAsync()
         {
-            return await general.Cars.ToListAsync<Car>();
+            return await general.Car.ToListAsync<Car>();
         }
         public async Task<Car> ReadByIdAsync(int code)
         {
-            return await general.Cars.FirstAsync(c => c.Id == code);
+            return await general.Car.FirstAsync(c => c.Id == code);
         }
 
         public Task<bool> UpdateAsync(Car newItem)
@@ -65,13 +65,31 @@ namespace Dal.Implemention
         {
             try
             {
-                Car car = await general.Cars.FirstOrDefaultAsync(c => c.Id == carId);
+                Car car = await general.Car.FirstOrDefaultAsync(c => c.Id == carId);
 
                 if (car != null)
                 {
-                    car.IsAvailable = !car.IsAvailable; // Toggle the availability
-                    await general.SaveChangesAsync();
-                    return true; // Update successful
+                    switch (car.Status)
+                    {
+                        case CarStatus.Available:
+                            car.Status = CarStatus.Taken;
+                            break;
+                        case CarStatus.Taken:
+                            car.Status = CarStatus.Returned;
+                            break;
+                        case CarStatus.Returned:
+                            car.Status = CarStatus.Available;
+                            break;
+                        case CarStatus.Reserved:
+                            car.Status = CarStatus.Available;
+                            break;
+                            
+                        default:
+                            throw new ArgumentOutOfRangeException("Unknown car status");
+                    }
+                //    car.IsAvailable = !car.IsAvailable; // Toggle the availability
+                   await general.SaveChangesAsync();
+                   return true; // Update successful
                 }
                 else
                 {

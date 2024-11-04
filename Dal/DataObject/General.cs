@@ -15,7 +15,7 @@ public partial class General : DbContext
     {
     }
 
-    public virtual DbSet<Car> Cars { get; set; }
+    public virtual DbSet<Car> Car { get; set; }
 
     public virtual DbSet<City> Cities { get; set; }
 
@@ -28,6 +28,8 @@ public partial class General : DbContext
     public virtual DbSet<Street> Streets { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<Rentals> Rentals { get; set; }
+
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -43,6 +45,14 @@ public partial class General : DbContext
                 .HasMaxLength(1)
                 .IsUnicode(false)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
+            //Add Parse Type Status
+            entity.Property(e => e.Status)
+                .HasConversion
+                (
+                v => v.ToString(),
+                 //   v => (CarStatus)Enum.Parse(typeof(CarStatus), v)
+                 v => Enum.Parse<CarStatus>(v)
+          );
         });
 
         modelBuilder.Entity<City>(entity =>
@@ -128,6 +138,24 @@ public partial class General : DbContext
                 .IsUnicode(false)
                 .UseCollation("SQL_Latin1_General_CP1_CI_AS");
         });
+        modelBuilder.Entity<Rentals>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__Rentals__3214EC07E3AAC4F1");
+
+            entity.HasOne(d => d.Car)
+                  .WithMany(p => p.Rentals) // אם Car מכילה ICollection<Rental> 
+                  .HasForeignKey(d => d.CarId)
+                  .OnDelete(DeleteBehavior.ClientSetNull)
+                  .HasConstraintName("FK__Rentals__CarId__7CD98669");
+
+            entity.HasOne(d => d.User)
+                  .WithMany(p => p.Rentals) // אם User מכילה ICollection<Rental> 
+                  .HasForeignKey(d => d.UserId)
+                  .OnDelete(DeleteBehavior.ClientSetNull)
+                  .HasConstraintName("FK__Rentals__UserId__7CD98669");
+        });
+
+
 
         OnModelCreatingPartial(modelBuilder);
     }

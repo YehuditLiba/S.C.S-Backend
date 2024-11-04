@@ -13,7 +13,8 @@ namespace BL.profiles
     {
         public CarAndCarDTO()
         {
-            CreateMap<Car, CarDTO>().ReverseMap();
+            CreateMap<Car, CarDTO>().ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status)) 
+            .ReverseMap();
         }
     }
 }

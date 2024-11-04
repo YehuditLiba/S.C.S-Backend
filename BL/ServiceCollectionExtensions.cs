@@ -18,10 +18,11 @@ namespace BL
             services.AddScoped<IStationService, StationService>();
             services.AddScoped<IUserService, UserService>();
           services.AddScoped<ICarService, CarService>();
-            services.AddAutoMapper(typeof(UserAndUserDTO));
-            services.AddAutoMapper(typeof(StationAndStationDTO));
-            services.AddAutoMapper(typeof(CarAndCarDTO));
-            services.AddRepositories();
+     //       services.AddAutoMapper(typeof(UserAndUserDTO));
+     //       services.AddAutoMapper(typeof(StationAndStationDTO));
+     //       services.AddAutoMapper(typeof(CarAndCarDTO));
+              services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+              services.AddRepositories();
         }
     }
 }
