@@ -68,7 +68,11 @@ namespace Dal.DalImplements
         {
             return await general.Users.Where(x => x.Password == password).FirstOrDefaultAsync();
         }
-      
 
+        public async Task<User> GetByNameAsync(string userName)
+        {
+            return await general.Users
+                .FirstOrDefaultAsync(u => u.Name == userName);  // מחפש את המשתמש לפי שם
+        }
     }
 }

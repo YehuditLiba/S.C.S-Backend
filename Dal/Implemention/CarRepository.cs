@@ -27,22 +27,29 @@ namespace Dal.Implemention
         {
             try
             {
-                // Step 1: Update the StationToCar table to set CarId to NULL
+                // Step 1: Ensure the car exists before attempting to delete
+                Car car = await general.Car.FindAsync(carId);
+                if (car == null)
+                {
+                    return false;  // Return false if the car does not exist
+                }
+
+                // Step 2: Update the StationToCar table to set CarId to NULL
                 var stationToCarEntries = general.StationToCars.Where(stc => stc.CarId == carId);
                 foreach (var entry in stationToCarEntries)
                 {
                     entry.CarId = null;
                 }
 
-                // Step 2: Remove the car from the Cars table
-                Car car = general.Car.Find(carId);
+                // Step 3: Remove the car from the Cars table
                 general.Car.Remove(car);
 
                 await general.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error deleting car with ID {carId}: {ex.Message}");
                 return false;
             }
         }
@@ -65,10 +72,12 @@ namespace Dal.Implemention
         {
             try
             {
+                // Find the car in the database
                 Car car = await general.Car.FirstOrDefaultAsync(c => c.Id == carId);
 
                 if (car != null)
                 {
+                    // Toggle the car status
                     switch (car.Status)
                     {
                         case CarStatus.Available:
@@ -83,26 +92,35 @@ namespace Dal.Implemention
                         case CarStatus.Reserved:
                             car.Status = CarStatus.Available;
                             break;
-                            
                         default:
                             throw new ArgumentOutOfRangeException("Unknown car status");
                     }
-                //    car.IsAvailable = !car.IsAvailable; // Toggle the availability
-                   await general.SaveChangesAsync();
-                   return true; // Update successful
+
+                    await general.SaveChangesAsync();
+                    return true; // Success
                 }
                 else
                 {
-                    return false;
+                    Console.WriteLine($"Car with ID {carId} not found.");
+                    return false; // Car does not exist
                 }
             }
             catch (Exception ex)
             {
-                // Handle any exceptions that occurred during the update
-                Console.WriteLine($"An error occurred while toggling the car availability: {ex.Message}");
-                return false; // Update failed
+                Console.WriteLine($"Error changing status for car with ID {carId}: {ex.Message}");
+                return false; // Failure
             }
-
         }
+        public async Task<Car> GetByNameAsync(string carName)
+        {
+            return await general.Car
+                .FirstOrDefaultAsync(c => c.Name == carName);  // מחפש את הרכב לפי שם
+        }
+        public async Task<Car> ReadByNameAsync(string carName)
+        {
+            return await general.Car
+                .FirstOrDefaultAsync(c => c.Name == carName); // אם צריך, אפשר להוסיף לוגיקה נוספת
+        }
+
     }
 }

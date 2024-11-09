@@ -21,8 +21,6 @@ public partial class Car
 
     public int NumOfSeets { get; set; }
 
-    //public bool IsAvailable { get; set; }
-    //IsEvalable from enum 
     public CarStatus Status { get; set; }
 
     public virtual StationToCar? StationToCar { get; set; }

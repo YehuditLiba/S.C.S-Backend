@@ -11,5 +11,4 @@ public partial class City
 
    
     public virtual ICollection<Neighborhood> Neighborhoods { get; } = new List<Neighborhood>();
-    public virtual ICollection<Rentals> Rentals { get; set; }
 }

@@ -10,5 +10,7 @@ namespace Dal.Interfaces
     public interface ICarRepository:IRepository<Car>
     {
         public Task<bool> ChangeTheCarModeAsync(int carId);
+        Task<Car> GetByNameAsync(string carName);
+        Task<Car> ReadByNameAsync(string carName);
     }
 }

@@ -30,7 +30,7 @@ namespace BL.Implementation
         }
         public async Task<bool> DeleteAsync(int id)
         {
-              return  await carRepository.DeleteAsync(id);
+            return await carRepository.DeleteAsync(id);
         }
 
         public async Task<List<CarDTO>> ReadAllAsync()
@@ -54,5 +54,13 @@ namespace BL.Implementation
         {
             return await carRepository.ChangeTheCarModeAsync(carId);
         }
+        public async Task<CarDTO> ReadByNameAsync(string carName)
+        {
+            Car car = await carRepository.GetByNameAsync(carName); // פנה למאגר הרכבים לפי שם
+            CarDTO carDTO = mapper.Map<CarDTO>(car); 
+            return carDTO;
+        }
     }
-}
+        
+    }
+

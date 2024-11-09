@@ -103,49 +103,47 @@ namespace BL.Implementation
 
             const string API_KEY = "AIzaSyBFwHxGY47K0J1ECt99_TZA7aVO62ztUp0";
             const string BASE_URL = "https://maps.googleapis.com/maps/api/geocode/json";
-            private Point convertStationDTOToPoint(StationDTO stationDTO)
+        private Point convertStationDTOToPoint(StationDTO stationDTO)
+        {
+            StationDTO locationFromGoogleMaps;
+            Point point = new Point();
+            string country = "IL";
+            string url = BASE_URL + "?address=" + stationDTO.Street + "st" + stationDTO.City + "&components==country:" + country + "&key=" + API_KEY;
+            try
             {
-                StationDTO locationFromGoogleMaps;
-                Point point = new Point();
-                string country = "IL";
-                string url = BASE_URL + "?address=" + stationDTO.Street + "st" + stationDTO.City + "&components==country:" + country + "&key=" + API_KEY;
-                try
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+                WebResponse response = request.GetResponse();
+                Stream dataStream = response.GetResponseStream();
+                StreamReader reader = new StreamReader(dataStream);
+                string responseJson = reader.ReadToEnd();
+                dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(responseJson);
+                if (result.status == "OK")
                 {
-                    HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                    WebResponse response = request.GetResponse();
-                    Stream dataStream = response.GetResponseStream();
-                    StreamReader reader = new StreamReader(dataStream);
-                    string responseJson = reader.ReadToEnd();
-                    dynamic result = Newtonsoft.Json.JsonConvert.DeserializeObject(responseJson);
-                    if (result.status == "OK")
-                    {
-                        point.X = result.results[0].geometry.location.lat;
-                        point.Y = result.results[0].geometry.location.lng;
-                        //the next lines will change the object stationDTO, because the function got it as a reference type
+                    point.X = result.results[0].geometry.location.lat;
+                    point.Y = result.results[0].geometry.location.lng;
+                    //the next lines will change the object stationDTO, because the function got it as a reference type
 
-                        //stationDTO.Number=result.results[0].geometry.number;
-                        stationDTO.Number = 0;
-                        stationDTO.Street = result.results[0].address_components[0].short_name;
-                        //stationDTO.Neighborhood = result.results[0].address_components[1].short_name;
-                        stationDTO.Neighborhood = null;
-                        stationDTO.City = result.results[0].address_components[1].short_name;
+                    //stationDTO.Number=result.results[0].geometry.number;
+                    stationDTO.Number = 0;
+                    stationDTO.Street = result.results[0].address_components[0].short_name;
+                    //stationDTO.Neighborhood = result.results[0].address_components[1].short_name;
+                    stationDTO.Neighborhood = null;
+                    stationDTO.City = result.results[0].address_components[1].short_name;
 
-                        //locationFromGoogleMaps = new StationDTO (result[1]???????????,result[0].?????,???,???);
-                    }
+                    //locationFromGoogleMaps = new StationDTO (result[1]???????????,result[0].?????,???,???);
                 }
-                catch (WebException)
-                {
-                    //until our seminary will open google maps service:)
-                    point.X = 3.333;
-                    point.Y = 3.333;
-                    stationDTO.Number = 51;
-                    stationDTO.Street = "Chazon-Ish";
-                    stationDTO.Neighborhood = "Ramat-Shlomo";
-                    stationDTO.City = "Jerusalem";
-                }
-                return point;
             }
-
-
+            catch (WebException)
+            {
+                //until our seminary will open google maps service:)
+                point.X = 3.333;
+                point.Y = 3.333;
+                stationDTO.Number = 51;
+                stationDTO.Street = "Chazon-Ish";
+                stationDTO.Neighborhood = "Ramat-Shlomo";
+                stationDTO.City = "Jerusalem";
+            }
+            return point;
         }
-    } 
+    }
+ } 

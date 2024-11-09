@@ -9,5 +9,6 @@ namespace Dal.Interfaces
     public interface IUserRepository : IRepository<User>
     {
         public Task<User> ReadByPasswordAsync(string password);
+        Task<User> GetByNameAsync(string userName);
     }
 }

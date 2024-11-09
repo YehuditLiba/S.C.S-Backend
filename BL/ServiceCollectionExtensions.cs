@@ -17,12 +17,13 @@ namespace BL
         {
             services.AddScoped<IStationService, StationService>();
             services.AddScoped<IUserService, UserService>();
-          services.AddScoped<ICarService, CarService>();
-     //       services.AddAutoMapper(typeof(UserAndUserDTO));
-     //       services.AddAutoMapper(typeof(StationAndStationDTO));
-     //       services.AddAutoMapper(typeof(CarAndCarDTO));
-              services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-              services.AddRepositories();
+            services.AddScoped<IRentalsService, RentalsService>();
+            services.AddScoped<ICarService, CarService>();
+            //       services.AddAutoMapper(typeof(UserAndUserDTO));
+            //       services.AddAutoMapper(typeof(StationAndStationDTO));
+            //       services.AddAutoMapper(typeof(CarAndCarDTO));
+            services.AddAutoMapper(typeof(UserAndUserDTO), typeof(StationAndStationDTO), typeof(CarAndCarDTO), typeof(RentaiAndRentalDTO));
+            services.AddRepositories();
         }
     }
 }

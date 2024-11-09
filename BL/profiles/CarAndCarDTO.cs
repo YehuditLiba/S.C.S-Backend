@@ -9,12 +9,13 @@ using Dal.DataObject;
 
 namespace BL.profiles
 {
-    internal class CarAndCarDTO:Profile
+    public class CarAndCarDTO : Profile
     {
         public CarAndCarDTO()
         {
-            CreateMap<Car, CarDTO>().ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status)) 
-            .ReverseMap();
+            CreateMap<Car, CarDTO>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status)) // מיפוי Status ל-Status
+                .ReverseMap();
         }
     }
 }

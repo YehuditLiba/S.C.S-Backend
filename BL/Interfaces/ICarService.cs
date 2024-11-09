@@ -11,5 +11,8 @@ namespace BL.Interfaces
     public interface ICarService:IService<CarDTO>
     {
         public Task<bool> ChangeTheCarModeAsync(int carId);
+        Task<CarDTO> ReadByNameAsync(string carName);
+
+
     }
 }

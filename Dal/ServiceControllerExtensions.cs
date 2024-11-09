@@ -23,6 +23,7 @@ public static class ServiceControllerExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IStationRepository, StationRepository>();
         services.AddScoped<ICarRepository, CarRepository>();
+        services.AddScoped<IRentalRepository, RentalRepository>();
         services.AddDbContext<General>(options => options.UseSqlServer(connString));
     }
 
