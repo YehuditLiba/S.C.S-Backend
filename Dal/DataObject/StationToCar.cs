@@ -12,6 +12,5 @@ public partial class StationToCar
     public int? CarId { get; set; }
 
     public virtual Car? Car { get; set; }
-
-    public virtual Station Station { get; set; } = null!;
+    public virtual Station? Station { get; set; }
 }

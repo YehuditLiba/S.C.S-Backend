@@ -18,7 +18,6 @@ public partial class Station
     public bool? IsCenteral { get; set; }
 
     public virtual ICollection<StationToCar> StationToCars { get; } = new List<StationToCar>();
-
     public virtual Street Street { get; set; } = null!;
 
 }

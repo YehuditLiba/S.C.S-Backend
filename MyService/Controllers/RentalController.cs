@@ -47,6 +47,7 @@ public class RentalController : ControllerBase
         var rentals = await rentalService.ReadAllAsync();
         return Ok(rentals);
     }
+
 }
    
     

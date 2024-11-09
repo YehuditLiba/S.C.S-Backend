@@ -45,13 +45,23 @@ public class RentalRepository : IRentalRepository
     // פונקציה לקרוא את כל השכירויות
     public async Task<List<Rentals>> ReadAllAsync()
     {
-        return await _context.Rentals
-            .Include(r => r.Car)
-            .Include(r => r.User)
-            .ToListAsync();
+        var rentals = await _context.Rentals
+       .Include(r => r.Car)
+       .Include(r => r.User)
+       .ToListAsync();
+
+        // לוגים להצגת התוצאות מהמסד נתונים לפני המיפוי
+        foreach (var rental in rentals)
+        {
+            Console.WriteLine($"Rental ID: {rental.Id}");
+            Console.WriteLine($"Car ID: {rental.CarId}, Car Name: {rental.Car?.Name}");
+            Console.WriteLine($"User ID: {rental.UserId}, User Name: {rental.User?.Name}");
+        }
+
+        return rentals;
     }
 
-    public async Task<bool> UpdateAsync(Rentals newItem)
+        public async Task<bool> UpdateAsync(Rentals newItem)
     {
         var existingRental = await _context.Rentals.FindAsync(newItem.Id);
         if (existingRental == null)
@@ -80,5 +90,22 @@ public class RentalRepository : IRentalRepository
         await _context.SaveChangesAsync();
         return true;
     }
+    public async Task<Station> GetStationByCarIdAsync(int carId)
+    {
+        var stationToCar = await _context.StationToCars
+            .FirstOrDefaultAsync(stationToCar => stationToCar.CarId == carId);
+
+        if (stationToCar == null)
+        {
+            return null;  // אם לא נמצאה תחנה מתאימה לרכב
+        }
+
+        // חפש תחנה לפי StationId מתוך DbSet של Station
+        var station = await _context.Stations
+            .FirstOrDefaultAsync(s => s.Id == stationToCar.StationId);
+
+        return station;
+    }
+
 
 }

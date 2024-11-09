@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BL.DTO;
+using BL;
 using BL.Interfaces;
 using Dal.DataObject;
 using Dal.Interfaces;
@@ -20,9 +21,25 @@ namespace BL.Implementation
         // פונקציה ליצירת שכירות
         public async Task<int> CreateAsync(RentalsDTO rentalDto)
         {
+            // ממפה את ה-DTO לאובייקט Entity
             var rental = mapper.Map<Rentals>(rentalDto);
+
+            // אם יש צורך, עדכון פרמטרים נוספים לפני השמירה
+            if (rental.CarId != null)
+            {
+                // אם יש צורך, ביצוע פעולות נוספות כמו חישוב מחיר או בדיקות תקינות
+                var station = await rentalsRepository.GetStationByCarIdAsync(rental.CarId); // בדוק אם הפונקציה קיימת במאגר
+                if (station != null && station.IsCenteral == true)
+                {
+                    // לעדכן את המחיר לפי תחנה מרכזית אם יש צורך
+                    rental.Price = CalculateRentalPrice(rentalDto, station);
+                }
+            }
+
+            // שמירת האובייקט החדש ב-Repository
             return await rentalsRepository.CreateAsync(rental);
         }
+
 
         // פונקציה לקרוא שכירות לפי ID
         public async Task<RentalsDTO> ReadByIdAsync(int id)
@@ -31,11 +48,19 @@ namespace BL.Implementation
             return rental != null ? mapper.Map<RentalsDTO>(rental) : null;
         }
 
-        // פונקציה לקרוא את כל השכירויות
         public async Task<List<RentalsDTO>> ReadAllAsync()
         {
             var rentals = await rentalsRepository.ReadAllAsync();
-            return mapper.Map<List<RentalsDTO>>(rentals);
+            var rentalsDto = mapper.Map<List<RentalsDTO>>(rentals);
+
+            // לוגים להצגת הנתונים לאחר המיפוי ל-DTO
+            foreach (var rentalDto in rentalsDto)
+            {
+                Console.WriteLine($"Car Name: {rentalDto.CarName}");
+                Console.WriteLine($"User Name: {rentalDto.UserName}");
+            }
+
+            return rentalsDto;
         }
 
         // מימוש הפונקציה UpdateAsync (לעדכן שכירות)
@@ -52,29 +77,22 @@ namespace BL.Implementation
         }
 
         // פונקציה לחישוב המחיר
-        public double CalculateRentalPrice(double distance, DateTime startDate, DateTime endDate, bool hasDiscount)
+        public double CalculateRentalPrice(RentalsDTO rentalDto, Station station)
         {
-            // חישוב תעריף ליחידת זמן
-            double hourlyPrice = PriceDetermination.Avg_price_of_taxi_fare_for_km();
-            double dailyPrice = PriceDetermination.Price_per_day();
+            var basePrice = PriceDetermination.Price_per_day();
+            var farePerKm = PriceDetermination.Avg_price_of_taxi_fare_for_km();
+            var discount = PriceDetermination.Discount();
 
-            // חישוב המחיר לפי המרחק
-            double distancePrice = distance * hourlyPrice;
-
-            // חישוב המחיר לפי הזמן (פרש בין startDate ל-endDate)
-            double rentalDuration = (endDate - startDate).TotalHours;
-            double timePrice = rentalDuration * hourlyPrice;
-
-            // סך כל המחיר
-            double totalPrice = distancePrice + timePrice;
-
-            // חישוב הנחה
-            if (hasDiscount)
+            // אם התחנה היא מרכזית, העלה את המחיר ב-20%
+            if (station != null && station.IsCenteral == true)
             {
-                totalPrice -= totalPrice * PriceDetermination.Discount();
+                basePrice *= 1.2;  // העלאת המחיר ב-20%
             }
 
-            return totalPrice;
+            // חישוב המחיר עם הנחה
+            double finalPrice = basePrice * (1 - discount);
+            return finalPrice;
         }
+
     }
 }
