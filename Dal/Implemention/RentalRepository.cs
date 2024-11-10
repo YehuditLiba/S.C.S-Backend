@@ -107,5 +107,15 @@ public class RentalRepository : IRentalRepository
         return station;
     }
 
+    public async Task<List<Rentals>> GetRentalsByUserNameAsync(string userName)
+    {
+        var rentals = await _context.Rentals
+            .Include(r => r.Car)
+            .Include(r => r.User)
+            .Where(r => r.User.Name == userName) // חפש לפי שם המשתמש
+            .ToListAsync();
+
+        return rentals;
+    }
 
 }

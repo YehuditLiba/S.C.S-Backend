@@ -93,6 +93,35 @@ namespace BL.Implementation
             double finalPrice = basePrice * (1 - discount);
             return finalPrice;
         }
+        public async Task<List<RentalsDTO>> GetRentalsByUserNameAsync(string userName)
+        {
+            var rentals = await rentalsRepository.GetRentalsByUserNameAsync(userName);
+            return rentals != null ? mapper.Map<List<RentalsDTO>>(rentals) : null;
+        }
+        public double CalculateRentalDurationInHours(int rentalId)
+        {
+            var rental = rentalsRepository.ReadByIdAsync(rentalId).Result;
+            if (rental == null)
+            {
+                throw new Exception("Rental not found");
+            }
+
+            // נוודא ששני התאריכים (StartDate ו-EndDate) אינם null לפני החישוב
+            if (rental.StartDate.HasValue && rental.EndDate.HasValue)
+            {
+                // חישוב ההפרש בין StartDate ל-EndDate בשעות
+                TimeSpan rentalDuration = rental.EndDate.Value - rental.StartDate.Value;
+
+                // מחזירים את מספר השעות (TotalHours)
+                return rentalDuration.TotalHours;
+            }
+            else
+            {
+                // אם אחד מהתאריכים לא קיים, נחזיר 0 או ערך אחר מתאים
+                throw new Exception("StartDate or EndDate is missing");
+            }
+        }
+
 
     }
 }
