@@ -79,10 +79,6 @@ public class RentalController : ControllerBase
         });
     }
 
-
-
-
-
 }
 
 

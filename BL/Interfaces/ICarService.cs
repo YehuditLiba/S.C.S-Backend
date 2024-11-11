@@ -12,6 +12,9 @@ namespace BL.Interfaces
     {
         public Task<bool> ChangeTheCarModeAsync(int carId);
         Task<CarDTO> ReadByNameAsync(string carName);
+        Task<bool> RentCarAsync(int carId, int stationId);
+        Task<bool> ReturnCarAsync(string carName, int statiId);
+
 
 
     }

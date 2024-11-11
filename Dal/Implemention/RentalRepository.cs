@@ -117,5 +117,4 @@ public class RentalRepository : IRentalRepository
 
         return rentals;
     }
-
 }

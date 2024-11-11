@@ -13,6 +13,8 @@ namespace BL.DTO
         public string Street { get; set; }
         public string City { get; set; }
         public string Neighborhood { get; set; }
+        public bool IsFull { get; set; } 
+
         //להוסיף בDAL את NUMBER
         public StationDTO(int number, string street, string neighborhood, string city)
         {
