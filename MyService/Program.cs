@@ -2,6 +2,7 @@ using AutoMapper;
 using BL;
 using BL.Implementation;
 using BL.Interfaces;
+using BL.profiles;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAppServices();
+
+// Add AutoMapper with profiles
+builder.Services.AddAutoMapper(typeof(StationAndStationDTO));
 
 var provider = builder.Services.BuildServiceProvider();
 var configuration = provider.GetRequiredService<IConfiguration>();
@@ -30,7 +34,6 @@ catch (AutoMapperConfigurationException ex)
 {
     Console.WriteLine($"AutoMapper configuration error: {ex.Message}");
     Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-    // תוכל להוסיף גם את השמות של כל המיפויים שלך כאן כדי לוודא שהם תקינים
 }
 catch (Exception ex)
 {

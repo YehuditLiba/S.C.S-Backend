@@ -15,14 +15,26 @@ namespace MyService.Controllers
         }
 
         [HttpPost]
-        public async Task<int> CreateUser([FromBody] string name, string email, string password)
+        public async Task<ActionResult<UserDTO>> CreateUser([FromBody] string name, string email, string password)
         {
-            UserDTO userDTO = new UserDTO();
-            userDTO.Name = name;
-            userDTO.Email = email;
-            userDTO.Password = password;
-            return await userService.CreateAsync(userDTO);
+            UserDTO userDTO = new UserDTO
+            {
+                Name = name,
+                Email = email,
+                Password = password
+            };
+
+            int userId = await userService.CreateAsync(userDTO);
+
+            // במקרה של יצירה מוצלחת, החזר את ה-UserDTO יחד עם ה-ID
+            userDTO.Equals(userId);
+
+            // מחזירים את ה-UserDTO עם ה-ID החדש
+            return Ok(userDTO);
         }
+
+
+
         [HttpGet]
         public async Task<List<UserDTO>> GetUsers()
         {

@@ -19,7 +19,6 @@ public class RentalRepository : IRentalRepository
         return newRental.Entity.Id;
     }
 
-    // פונקציה לקרוא אובייקט לפי ID
     public async Task<Rentals> ReadByIdAsync(int id)
     {
         try
@@ -42,7 +41,6 @@ public class RentalRepository : IRentalRepository
         }
     }
 
-    // פונקציה לקרוא את כל השכירויות
     public async Task<List<Rentals>> ReadAllAsync()
     {
         var rentals = await _context.Rentals
@@ -50,7 +48,6 @@ public class RentalRepository : IRentalRepository
        .Include(r => r.User)
        .ToListAsync();
 
-        // לוגים להצגת התוצאות מהמסד נתונים לפני המיפוי
         foreach (var rental in rentals)
         {
             Console.WriteLine($"Rental ID: {rental.Id}");
@@ -61,7 +58,7 @@ public class RentalRepository : IRentalRepository
         return rentals;
     }
 
-        public async Task<bool> UpdateAsync(Rentals newItem)
+    public async Task<bool> UpdateAsync(Rentals newItem)
     {
         var existingRental = await _context.Rentals.FindAsync(newItem.Id);
         if (existingRental == null)
@@ -97,10 +94,9 @@ public class RentalRepository : IRentalRepository
 
         if (stationToCar == null)
         {
-            return null;  // אם לא נמצאה תחנה מתאימה לרכב
+            return null;  
         }
 
-        // חפש תחנה לפי StationId מתוך DbSet של Station
         var station = await _context.Stations
             .FirstOrDefaultAsync(s => s.Id == stationToCar.StationId);
 
@@ -112,7 +108,7 @@ public class RentalRepository : IRentalRepository
         var rentals = await _context.Rentals
             .Include(r => r.Car)
             .Include(r => r.User)
-            .Where(r => r.User.Name == userName) // חפש לפי שם המשתמש
+            .Where(r => r.User.Name == userName)
             .ToListAsync();
 
         return rentals;

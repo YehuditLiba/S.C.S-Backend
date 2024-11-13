@@ -1,4 +1,5 @@
 ﻿using BL.DTO;
+using BL.Implementation;
 using BL.Interfaces;
 using BL.profiles;
 using Dal.DataObject;
@@ -13,51 +14,61 @@ namespace MyService.Controllers
         {
             this.stationService = stationService;
         }
-        [HttpGet]
-        public async Task<StationDTO> GetNearestStation(int num, string street, string neighborhood, string city)
-        {
-            StationDTO stationDTO = new StationDTO(num, street, neighborhood, city);
-            return await stationService.GetNearestStation(stationDTO);
-        }
-        [HttpGet]
-        [Route("{numOfRentalHours}")]
-        public async Task<StationDTO> FindLucrativeStation(int numOfRentalHours, [FromBody] int num, string street, string neighborhood, string city)
-        {
-            StationDTO stationDTO = new StationDTO(num, street, neighborhood, city);
-            return await stationService.GetLucrativeStation(numOfRentalHours, stationDTO);
-        }
+
         [HttpGet]
         [Route("{getAll}")]
         public async Task<List<StationDTO>> GetAllAsync(string getAll = null)
         {
             return await stationService.ReadAllAsync();
         }
-        //can not do the next lines because it is the same route to the function FindLucrativeStation
-        
-        //[HttpGet]
-        //[Route("{id}")]
-        //public async Task<Station>GetByIdAsync (int id)
-        //{
-        //    return await stationService.ReadByIdAsync(id);
-        //}
 
-        [HttpPost]
-        public async Task<int> CreateAsync(int num , string street , string neighborhood , string city)
-        {
-            StationDTO stationDTO = new StationDTO(num , street , neighborhood , city);
-            return await stationService.CreateAsync(stationDTO);
-        }
         [HttpPut]
-        public async Task<bool> UpdateAsync (StationDTO stationDTO)
+        public async Task<bool> UpdateAsync(StationDTO stationDTO)
         {
             return await stationService.UpdateAsync(stationDTO);
         }
         [HttpDelete]
-        public async Task<bool> DeleteAsync (int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            return await stationService.DeleteAsync(id);  
+            return await stationService.DeleteAsync(id);
         }
- 
+        [HttpPost("GetNearestStation")]
+        public async Task<ActionResult<StationDTO>> GetNearestStation([FromBody] StationDTO stationDTO)
+        {
+            if (stationDTO == null || stationDTO.X == 0 || stationDTO.Y == 0)
+            {
+                return BadRequest("הקואורדינטות לא תקינות.");
+            }
+
+            StationDTO nearestStation = await stationService.GetNearestStation(stationDTO.X, stationDTO.Y);
+
+            if (nearestStation == null)
+            {
+                return NotFound("לא נמצאה תחנה קרובה.");
+            }
+
+            return Ok(nearestStation); 
+        }
+
+        [HttpPost("GetLucrativeStation")]
+      
+        public async Task<IActionResult> GetLucrativeStation([FromBody] StationDTO stationDTO)
+        {
+         
+            var station = await stationService.GetLucrativeStation(
+                numberOfRentalDays: 5,  // מספר ימי השכרה
+                x: stationDTO.X, // קואורדינטת X
+                y: stationDTO.Y  // קואורדינטת Y
+            );
+
+            if (station == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(station);
+        }
+
+
     }
 }
-

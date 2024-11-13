@@ -16,6 +16,15 @@ namespace BL.profiles
             CreateMap<Car, CarDTO>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status)) // מיפוי Status ל-Status
                 .ReverseMap();
+          
+            CreateMap<Station, StationDTO>()
+             .ForMember(dest => dest.CarNames, opt => opt.MapFrom(src => src.StationToCars.Select(car => car.Id.ToString()).ToList())) // המרה ל-Id של רכבים
+             .ReverseMap();
+            CreateMap<Car, CarDTO>()
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => (Dal.DataObject.CarStatus?)src.Status))  // המרת הסטטוס ל-nullable
+            .ReverseMap();
+
+
         }
     }
 }

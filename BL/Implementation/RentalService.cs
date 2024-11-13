@@ -18,30 +18,21 @@ namespace BL.Implementation
             this.mapper = mapper;
         }
 
-        // פונקציה ליצירת שכירות
         public async Task<int> CreateAsync(RentalsDTO rentalDto)
         {
-            // ממפה את ה-DTO לאובייקט Entity
             var rental = mapper.Map<Rentals>(rentalDto);
-
-            // אם יש צורך, עדכון פרמטרים נוספים לפני השמירה
             if (rental.CarId != null)
             {
-                // אם יש צורך, ביצוע פעולות נוספות כמו חישוב מחיר או בדיקות תקינות
-                var station = await rentalsRepository.GetStationByCarIdAsync(rental.CarId); // בדוק אם הפונקציה קיימת במאגר
+                var station = await rentalsRepository.GetStationByCarIdAsync(rental.CarId);
                 if (station != null && station.IsCenteral == true)
                 {
-                    // לעדכן את המחיר לפי תחנה מרכזית אם יש צורך
                     rental.Price = CalculateRentalPrice(rentalDto, station);
                 }
             }
 
-            // שמירת האובייקט החדש ב-Repository
             return await rentalsRepository.CreateAsync(rental);
         }
 
-
-        // פונקציה לקרוא שכירות לפי ID
         public async Task<RentalsDTO> ReadByIdAsync(int id)
         {
             var rental = await rentalsRepository.ReadByIdAsync(id);
@@ -63,20 +54,19 @@ namespace BL.Implementation
             return rentalsDto;
         }
 
-        // מימוש הפונקציה UpdateAsync (לעדכן שכירות)
+        //  UpdateAsync 
         public async Task<bool> UpdateAsync(RentalsDTO rentalDto)
         {
             var rental = mapper.Map<Rentals>(rentalDto);
             return await rentalsRepository.UpdateAsync(rental);
         }
 
-        // מימוש הפונקציה DeleteAsync (למחוק שכירות)
+        //  DeleteAsync (למחוק שכירות)
         public async Task<bool> DeleteAsync(int id)
         {
             return await rentalsRepository.DeleteAsync(id);
         }
 
-        // פונקציה לחישוב המחיר
         public double CalculateRentalPrice(RentalsDTO rentalDto, Station station)
         {
             var basePrice = PriceDetermination.Price_per_day();

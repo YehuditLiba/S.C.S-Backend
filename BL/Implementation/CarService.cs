@@ -47,13 +47,11 @@ namespace BL.Implementation
             CarDTO carDTO = mapper.Map<CarDTO>(car);
             return carDTO;
         }
-
         public async Task<bool> UpdateAsync(CarDTO newItem)
         {
             Car car = mapper.Map<Car>(newItem);
             return await carRepository.UpdateAsync(car);
         }
-
         public async Task<bool> ChangeTheCarModeAsync(int carId)
         {
             return await carRepository.ChangeTheCarModeAsync(carId);
@@ -66,26 +64,24 @@ namespace BL.Implementation
         }
         public async Task<bool> RentCarAsync(int carId, int stationId)
         {
-            // 1. חיפוש הרכב והתחנה על פי המזהים
             var car = await carRepository.ReadByIdAsync(carId);
             var station = await _stationRepository.ReadByIdAsync(stationId);
             Console.WriteLine(station);
             Console.WriteLine(car);
-            // 2. אם הרכב או התחנה לא קיימים או הרכב כבר הושכר
+
             if (car == null || station == null || car.Status == Dal.DataObject.CarStatus.Taken)
             {
-                return false; // החזרת false אם לא ניתן להשכיר את הרכב
+                return false; // false 
             }
             Console.WriteLine(car.Status);
-            // 3. עדכון סטטוס הרכב ל-"Taken" (נלקח)
+            // Taken
             car.Status = Dal.DataObject.CarStatus.Reserved;
 
-            // 4. בדיקה אם כל הרכבים בתחנה אינם זמינים (תחנה מלאה)
+            
             bool stationIsFull = station.StationToCars.All(stc => stc.CarId == null || carRepository.ReadByIdAsync(stc.CarId.GetValueOrDefault()).Result.Status != Dal.DataObject.CarStatus.Available);
 
             if (stationIsFull)
             {
-                // 5. אם התחנה מלאה, עדכון הסטטוס שלה ל-"Full"
                 station.IsFull = false;
             }
 
@@ -95,45 +91,53 @@ namespace BL.Implementation
                 CarId = carId
             };
 
-            // 7. שמירה במסד הנתונים
             bool carUpdated = await carRepository.UpdateAsync(car);
             bool stationUpdated = await _stationRepository.UpdateAsync(station);
 
-            // 8. החזרת true אם העדכון בוצע בהצלחה עבור שני הגורמים
             return carUpdated && stationUpdated;
         }
         public async Task<bool> ReturnCarAsync(string carName, int stationId)
         {
-            // 1. חיפוש הרכב לפי שם והתחנה לפי מזהה
             var car = await carRepository.GetByNameAsync(carName);
             var station = await _stationRepository.ReadByIdAsync(stationId);
 
-            // 2. אם הרכב או התחנה לא נמצאו, או שהרכב אינו במצב "Taken"
-            if (car != null || station != null || car.Status != Dal.DataObject.CarStatus.Taken||car.Status!=Dal.DataObject.CarStatus.Reserved)
+            if (car == null || station == null || (car.Status != Dal.DataObject.CarStatus.Taken && car.Status != Dal.DataObject.CarStatus.Reserved))
             {
-                return true;
+                return false;
             }
 
-            // 3. עדכון סטטוס הרכב ל-"Available"
+            //"Available"
             car.Status = Dal.DataObject.CarStatus.Available;
 
-            // 4. בדיקה אם התחנה מתמלאת עם החזרת הרכב
+            //  StationToCar 
+            var stationToCarEntry = station.StationToCars.FirstOrDefault(stc => stc.CarId == null);
+            if (stationToCarEntry != null)
+            {
+                stationToCarEntry.CarId = car.Id;
+            }
+            else
+            {
+                //  StationToCar
+                station.StationToCars.Add(new StationToCar
+                {
+                    StationId = stationId,
+                    CarId = car.Id
+                });
+            }
+
             bool stationIsFull = station.StationToCars.All(stc =>
-                stc.CarId == null || carRepository.ReadByIdAsync(stc.CarId.GetValueOrDefault()).Result.Status == Dal.DataObject.CarStatus.Taken);
+                stc.CarId != null && carRepository.ReadByIdAsync(stc.CarId.GetValueOrDefault()).Result.Status == Dal.DataObject.CarStatus.Available);
 
             if (stationIsFull)
             {
                 station.IsFull = true;
             }
 
-            // 5. שמירה במסד הנתונים
             bool carUpdated = await carRepository.UpdateAsync(car);
             bool stationUpdated = await _stationRepository.UpdateAsync(station);
 
             return carUpdated && stationUpdated;
         }
-
     }
-
-}
+  }
 

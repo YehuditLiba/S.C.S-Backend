@@ -15,7 +15,7 @@ namespace MyService.Controllers
         public async Task<IActionResult> CreateCar(string name, int LicensePlate, int NumOfSeets, CarStatus status)
         {
 
-            CarDTO carDTO = new CarDTO(name, LicensePlate, NumOfSeets, status);
+            CarDTO carDTO = new CarDTO( name, LicensePlate, NumOfSeets, status);
             int carId = await carService.CreateAsync(carDTO);
             return Ok(carId);
         }
@@ -58,6 +58,7 @@ namespace MyService.Controllers
                 return BadRequest("Unable to rent the car.");
             }
         }
+
         [HttpPut]
         [Route("return")]
         public async Task<IActionResult> ReturnCar(string carName, int stationId)

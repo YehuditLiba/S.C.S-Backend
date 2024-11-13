@@ -1,16 +1,18 @@
 ﻿using Dal.DataObject;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Point = Dal.DataObject.Point;
 
 namespace Dal.Interfaces
 {
     public interface IStationRepository : IRepository<Station>
     {
-        public Task<Station> GetNearestStation(bool fullStation, bool isMustCenteral,Point point, string street, string neighorhood, string city);
+        // שיטה לחיפוש התחנה הקרובה ביותר על פי קואורדינטות X ו-Y
+        Task<Station> GetNearestStation(double x, double y);
+        Task<bool> IsStationFullAsync(int stationId);
+        Task<Station> ReadByIdWithCarsAsync(int stationId);
+        Task<Station> ReadByNumberAsync(int stationNumber);
+
+
     }
 }

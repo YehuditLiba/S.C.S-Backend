@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Dal.DataObject;
-
+[Table("Streets")]
 public partial class Street
 {
     public int Id { get; set; }

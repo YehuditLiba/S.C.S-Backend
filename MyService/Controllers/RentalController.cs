@@ -2,6 +2,9 @@
 using BL.DTO;
 using BL.Implementation;
 using BL.Interfaces;
+using Dal.DalImplements;
+using Dal.Implemention;
+using Dal.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,22 +16,42 @@ public class RentalController : ControllerBase
 {
     private readonly IRentalsService rentalService;
     private readonly IMapper _mapper;
+    private readonly IUserRepository userRepository;  // הוספת המשתנה
+    private readonly ICarRepository carRepository;
 
-    public RentalController(IRentalsService rentalService, IMapper mapper)
+    public RentalController(IRentalsService rentalService, IMapper mapper,
+                             IUserRepository userRepository, ICarRepository carRepository)
     {
         this.rentalService = rentalService;
         _mapper = mapper;
+        this.userRepository = userRepository;  // אתחול המשתנה
+        this.carRepository = carRepository;    // אתחול המשתנה
     }
 
-    // יצירת שכירות חדשה
     [HttpPost]
     public async Task<IActionResult> CreateRentalAsync(RentalsDTO rentalDto)
     {
-        var result = await rentalService.CreateAsync(rentalDto);  // שינית את השם כאן
+        var user = await userRepository.GetByNameAsync(rentalDto.UserName);
+        if (user == null)
+        {
+            return BadRequest("User not found.");
+        }
+
+        var car = await carRepository.GetByNameAsync(rentalDto.CarName);
+        if (car == null)
+        {
+            return BadRequest("Car not found.");
+        }
+
+        rentalDto.UserId = user.Code;  
+        rentalDto.CarId = car.Id;
+
+        var result = await rentalService.CreateAsync(rentalDto);
         return Ok(result);
+
     }
 
-    // פונקציה לקבלת שכירות לפי ID
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetRentalById(int id)
     {
@@ -40,7 +63,6 @@ public class RentalController : ControllerBase
         return Ok(rental);
     }
 
-    // פונקציה לקבלת כל השכירויות
     [HttpGet]
     public async Task<IActionResult> GetAllRentals()
     {
@@ -68,14 +90,13 @@ public class RentalController : ControllerBase
             return NotFound($"Rental not found with ID: {id}");
         }
 
-        // חישוב זמן השכירות בשעות
         double totalHours = rentalService.CalculateRentalDurationInHours(id);
 
-        // החזר את פרטי השכירות יחד עם מספר השעות
+       
         return Ok(new
         {
             rental,
-            TotalHours = totalHours  // החזר את הזמן הכולל בשעות יחד עם פרטי השכירות
+            TotalHours = totalHours  
         });
     }
 

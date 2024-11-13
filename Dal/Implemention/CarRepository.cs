@@ -22,26 +22,24 @@ namespace Dal.Implemention
             await general.SaveChangesAsync();
             return newCar.Entity.Id;
         }
-
         public async Task<bool> DeleteAsync(int carId)
         {
             try
             {
-                // Step 1: Ensure the car exists before attempting to delete
                 Car car = await general.Car.FindAsync(carId);
                 if (car == null)
                 {
-                    return false;  // Return false if the car does not exist
+                    return false;
                 }
 
-                // Step 2: Update the StationToCar table to set CarId to NULL
+                //  Update the StationToCar table to set CarId to NULL
                 var stationToCarEntries = general.StationToCars.Where(stc => stc.CarId == carId);
                 foreach (var entry in stationToCarEntries)
                 {
                     entry.CarId = null;
                 }
 
-                // Step 3: Remove the car from the Cars table
+                //  Remove the car from the Cars table
                 general.Car.Remove(car);
 
                 await general.SaveChangesAsync();
@@ -53,7 +51,6 @@ namespace Dal.Implemention
                 return false;
             }
         }
-
         public async Task<List<Car>> ReadAllAsync()
         {
             return await general.Car.ToListAsync<Car>();
@@ -62,7 +59,6 @@ namespace Dal.Implemention
         {
             return await general.Car.FirstAsync(c => c.Id == code);
         }
-
         public async Task<bool> UpdateAsync(Car newItem)
         {
             try
@@ -94,7 +90,6 @@ namespace Dal.Implemention
                 return false; // מחזיר false במקרה של שגיאה
             }
         }
-
         public async Task<bool> ChangeTheCarModeAsync(int carId)
         {
             Car car = await general.Car.FirstOrDefaultAsync(c => c.Id == carId);
@@ -132,76 +127,85 @@ namespace Dal.Implemention
         public async Task<Car> GetByNameAsync(string carName)
         {
             return await general.Car
-                .FirstOrDefaultAsync(c => c.Name == carName);  // מחפש את הרכב לפי שם
+                .FirstOrDefaultAsync(c => c.Name == carName); 
         }
         public async Task<Car> ReadByNameAsync(string carName)
         {
             return await general.Car
-                .FirstOrDefaultAsync(c => c.Name == carName); // אם צריך, אפשר להוסיף לוגיקה נוספת
+                .FirstOrDefaultAsync(c => c.Name == carName);
         }
         public async Task<bool> RentCarAsync(int carId, int stationId)
         {
-            // 1. חיפוש הרכב והתחנה על פי המזהים
             var car = await general.Car.FirstOrDefaultAsync(c => c.Id == carId);
             var station = await general.Stations.FirstOrDefaultAsync(s => s.Id == stationId);
-
-            // 2. בדיקה שהרכב והתחנה קיימים, והרכב זמין להשכרה
             if (car == null || station == null || car.Status == CarStatus.Taken)
             {
+                Console.WriteLine("Car or station not found, or car is already taken.");
                 return false;
             }
 
-            // 3. עדכון סטטוס הרכב ל-"Taken"
+            //-"Taken"
             car.Status = CarStatus.Taken;
 
-            // 4. עדכון טבלת StationToCar כדי לציין שהרכב נלקח מהתחנה
+            //  StationToCar
             var stationToCarEntry = await general.StationToCars
                 .FirstOrDefaultAsync(stc => stc.StationId == stationId && stc.CarId == carId);
 
             if (stationToCarEntry != null)
             {
-                stationToCarEntry.CarId = null; // מסמל שהרכב נלקח מהתחנה
+                stationToCarEntry.CarId = null; 
             }
-
-            // 5. עדכון התחנה כ"ריקה" אם אין בה רכבים זמינים
-            bool stationIsEmpty = station.StationToCars.All(stc => stc.CarId == null
-                || general.Car.FirstOrDefaultAsync(c => c.Id == stc.CarId).Result.Status == CarStatus.Taken);
+            else
+            {
+                await general.StationToCars.AddAsync(new StationToCar
+                {
+                    StationId = stationId,
+                    CarId = null
+                });
+            }
+            bool stationIsEmpty = station.StationToCars.All(stc => stc.CarId == null ||
+                general.Car.FirstOrDefaultAsync(c => c.Id == stc.CarId).Result.Status == CarStatus.Taken);
 
             if (stationIsEmpty)
             {
                 station.IsFull = false;
             }
 
-            // 6. שמירה במסד הנתונים
             await general.SaveChangesAsync();
-
             return true;
         }
         public async Task<bool> ReturnCarAsync(string carName, int stationId)
         {
-            // 1. חיפוש הרכב והתחנה לפי שם ומזהה
             var car = await general.Car.FirstOrDefaultAsync(c => c.Name == carName);
             var station = await general.Stations.FirstOrDefaultAsync(s => s.Id == stationId);
 
-            // 2. בדיקת קיום הרכב והתחנה, ושהרכב במצב "Taken"
-            if (car == null || station == null || car.Status != CarStatus.Taken)
+            //  "Taken" או "Reserved"
+            if (car == null || station == null || (car.Status != CarStatus.Taken && car.Status != CarStatus.Reserved))
             {
                 return false;
             }
 
-            // 3. עדכון סטטוס הרכב ל-"Available"
+            // "Available"
             car.Status = CarStatus.Available;
 
-            // 4. עדכון טבלת StationToCar במידת הצורך
+
             var stationToCarEntry = await general.StationToCars
-                .FirstOrDefaultAsync(stc => stc.StationId == stationId && stc.CarId == car.Id);
+                .FirstOrDefaultAsync(stc => stc.StationId == stationId && stc.CarId == null);
 
             if (stationToCarEntry != null)
             {
-                stationToCarEntry.CarId = car.Id;  // מציין שהרכב חוזר לתחנה
+                stationToCarEntry.CarId = car.Id;
+            }
+            else
+            {
+                //  StationToCar
+                general.StationToCars.Add(new StationToCar
+                {
+                    StationId = stationId,
+                    CarId = car.Id
+                });
             }
 
-            // 5. בדיקה אם התחנה מתמלאת עם החזרת הרכב
             bool stationIsFull = station.StationToCars.All(stc =>
                 stc.CarId != null && general.Car.FirstOrDefaultAsync(c => c.Id == stc.CarId).Result.Status == CarStatus.Available);
 
@@ -210,10 +214,17 @@ namespace Dal.Implemention
                 station.IsFull = true;
             }
 
-            // 6. שמירה במסד הנתונים
             await general.SaveChangesAsync();
 
             return true;
+        }
+        public async Task<List<Car>> GetAvailableCarsByStationIdAsync(int stationId)
+        {
+            //  StationToCar
+            return await general.StationToCars
+                .Where(stationToCar => stationToCar.StationId == stationId && stationToCar.Car.Status==CarStatus.Available)
+                .Select(stationToCar => stationToCar.Car)
+                .ToListAsync();
         }
 
     }

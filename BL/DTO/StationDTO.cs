@@ -1,33 +1,32 @@
-﻿using Dal.DataObject;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BL.DTO
+﻿namespace BL.DTO
 {
     public class StationDTO
     {
-        public int Number { get; set; }
-        public string Street { get; set; }
-        public string City { get; set; }
-        public string Neighborhood { get; set; }
-        public bool IsFull { get; set; } 
+        public int? Id { get; set; }
+        public int? Number { get; set; }
+        public string? Street { get; set; }
+        public string? City { get; set; }
+        public string? Neighborhood { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
+        public List<string>? CarNames { get; set; } = new List<string>();
 
-        //להוסיף בDAL את NUMBER
-        public StationDTO(int number, string street, string neighborhood, string city)
+        public StationDTO() { }
+
+        public StationDTO(int? id,int number, string street, string city, string neighborhood, double x, double y)
         {
+            Id = id;
             this.Number = number;
-            this.Neighborhood = neighborhood;
             this.Street = street;
             this.City = city;
+            this.Neighborhood = neighborhood;
+            this.X = x;
+            this.Y = y;
         }
-        //public StationDTO(string street, string neighborhood, string city)
-        //{
-        //    this.Neighborhood = neighborhood;
-        //    this.Street = street;
-        //    this.City = city;
-        //}
+        public StationDTO(double x, double y)
+        {
+            X = x;
+            Y = y;
+        }
     }
 }

@@ -21,16 +21,18 @@ namespace BL.DTO
     }
     public class CarDTO
     {
+      
         public string Name { get; set; }
 
-        public int LicensePlate { get; set; }
+        public int? LicensePlate { get; set; }
 
-        public int NumOfSeets { get; set; }
-        public CarStatus Status { get; set; }
+        public int? NumOfSeets { get; set; }
+        public CarStatus? Status { get; set; }
 
-        public string StatusAsString => Status.ToString();
+      //  public string StatusAsString => Status.ToString();
         public CarDTO(string name, int LicensePlate, int NumOfSeets, CarStatus status)
         {
+          
             this.Name = name;
             this.LicensePlate = LicensePlate;
             this.NumOfSeets = NumOfSeets;

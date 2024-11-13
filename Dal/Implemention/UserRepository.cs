@@ -72,7 +72,7 @@ namespace Dal.DalImplements
         public async Task<User> GetByNameAsync(string userName)
         {
             return await general.Users
-                .FirstOrDefaultAsync(u => u.Name == userName);  // מחפש את המשתמש לפי שם
+                .FirstOrDefaultAsync(u => u.Name == userName);  
         }
     }
 }
